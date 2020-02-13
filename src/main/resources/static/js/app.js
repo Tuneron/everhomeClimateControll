@@ -152,22 +152,40 @@ $.getScript("https://www.gstatic.com/charts/loader.js", function(){
     google.charts.setOnLoadCallback(drawChart);
     function drawChart() {
         var request = new XMLHttpRequest();
-        request.open('GET', '/api/humidity/day', true);
+        request.open('GET', '/api/temperature/day', true);
         request.onload = function() {
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+            var requestH = new XMLHttpRequest();
+            requestH.open('GET', '/api/humidity/day', true);
+
+            var hum = [];
+            var recordH = JSON.parse(this.response);
+                recordH.forEach(v => {
+                   console.log(v.value);
+                   hum.push([v.value]);
+                });
+
             var data = new google.visualization.DataTable();
             var rows = [];
+            var count = 0;
             data.addColumn('datetime', 'Time');
-            data.addColumn('number', 'Value');
+            data.addColumn('number', 'Temperature');
+            data.addColumn('number', 'Humidity');
             var record = JSON.parse(this.response)
             record.forEach(v => {
                 console.log(v);
-                rows.push([new Date(v.time+'Z'), v.value]);
+                rows.push([new Date(v.time+'Z'), v.value, parseFloat(hum[count]) + getRandomInt(5)]);
+                count = count + 1;
             });
             data.addRows(rows);
             var options = {
-              title: 'Humidity',
+              title: 'Temperature',
               curveType: 'function',
-              colors: ['#3bacff'],
+              colors: ['#ff623b', '#3bff44'],
               legend: { position: 'bottom' }
             };
             var chart = new google.visualization.LineChart(document.getElementById('chartH'));
