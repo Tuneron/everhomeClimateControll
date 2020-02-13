@@ -1,10 +1,7 @@
 package com.budova.everhome.controller;
 
 import com.budova.everhome.domain.*;
-import com.budova.everhome.repos.ConnectionRepo;
-import com.budova.everhome.repos.SetTemperatureRepo;
-import com.budova.everhome.repos.TemperatureRepo;
-import com.budova.everhome.repos.ValvePosRepo;
+import com.budova.everhome.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +13,8 @@ import java.util.List;
 public class HomeController {
 
     @Autowired
+    private HumidityRepo humidityRepo;
+    @Autowired
     private TemperatureRepo tempRepo;
     @Autowired
     private ValvePosRepo valvePosRepo;
@@ -26,14 +25,18 @@ public class HomeController {
 
     @GetMapping("/home")
     public String home(Model model) {
+        Humidity h = humidityRepo.findFirstByParamIsOrderByTimeDesc(Parameter.HUMIDITY);
         Temperature t1 = tempRepo.findFirstByParamIsOrderByTimeDesc(Parameter.TEMPERATURE_S1);
         Temperature t2 = tempRepo.findFirstByParamIsOrderByTimeDesc(Parameter.TEMPERATURE_S2);
         ValvePos v = valvePosRepo.findFirstByParamIsOrderByTimeDesc(Parameter.VALVE_POSITION);
         SetTemperature st = setTemperatureRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_TEMPERATURE);
         Connection c = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
+        model.addAttribute("humidity", h != null ? h.getValue() : "null");
+        model.addAttribute("myTemperature", t1 != null ? t1.getValue() : "null");
         model.addAttribute("temperature1", t1 != null ? t1.getValue() : "null");
         model.addAttribute("temperature2", t2 != null ? t2.getValue() : "null");
         model.addAttribute("set_temperature", st != null ? st.getValue() : "null");
+        model.addAttribute("mySet_temperature", st != null ? st.getValue() : "null");
         model.addAttribute("valve", v != null ? v.getValue() : "null");
         model.addAttribute("connection", c != null ? c.getValue() : "null");
         List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE_S1);

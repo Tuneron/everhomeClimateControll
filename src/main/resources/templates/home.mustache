@@ -18,16 +18,36 @@
     </h2>
 </noscript>
 
+<p>Hum</p>
+<p id="humidity">{{humidity}}</p>
+
+<p>(T1 + 2)</p>
+<p id="myTemperature">{{myTemperature}}</p>
+<p>T1</p>
 <p id="temperature1">{{temperature1}}</p>
+<p>T2</p>
 <p id="temperature2">{{temperature2}}</p>
+
 <div class="row">
     <p id="set_temperature">{{set_temperature}}</p>
     <button id="inc">+</button>
     <button id="dec">-</button>
 </div>
+
+<div class="row">
+    <p id="mySet_temperature">{{mySet_temperature}}</p>
+    <button id="myInc">+</button>
+    <button id="myDec">-</button>
+</div>
+
 <p id="valve">{{valve}}</p>
 <p id="connection">{{connection}}</p>
-<div id="chart" style="width: 900px; height: 500px"></div>
+
+<div class="row">
+<div id="chartT" style="width: 900px; height: 500px"></div>
+<div id="chartH" style="width: 900px; height: 500px"></div>
+</div>
+
 <p id="temperature3">{{temperature3}}</p>
 </body>
 </html>

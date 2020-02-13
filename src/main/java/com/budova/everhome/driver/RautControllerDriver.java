@@ -1,14 +1,8 @@
 package com.budova.everhome.driver;
 
 import com.budova.everhome.domain.*;
-import com.budova.everhome.dto.ConnectionDto;
-import com.budova.everhome.dto.SetTemperatureDto;
-import com.budova.everhome.dto.TemperatureDto;
-import com.budova.everhome.dto.ValvePosDto;
-import com.budova.everhome.repos.ConnectionRepo;
-import com.budova.everhome.repos.SetTemperatureRepo;
-import com.budova.everhome.repos.TemperatureRepo;
-import com.budova.everhome.repos.ValvePosRepo;
+import com.budova.everhome.dto.*;
+import com.budova.everhome.repos.*;
 import com.intelligt.modbus.jlibmodbus.Modbus;
 import com.intelligt.modbus.jlibmodbus.exception.ModbusIOException;
 import com.intelligt.modbus.jlibmodbus.exception.ModbusNumberException;
@@ -40,11 +34,13 @@ public class RautControllerDriver {
     private SetTemperatureRepo setTemperatureRepo;
     @Autowired
     private ConnectionRepo connectionRepo;
+    @Autowired
+    private HumidityRepo humidityRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
 
-    private final static String CONTROLLER_IP = "192.168.1.151";
+    private final static String CONTROLLER_IP = "192.168.1.152";
 
     private final TcpParameters tcpParameters;
     private final ModbusMaster master;
@@ -82,6 +78,16 @@ public class RautControllerDriver {
                 connectionRepo.save(c);
             }
 
+            float myTVal = (float) regs[0] / 10;
+            myTVal = myTVal +2F;
+            Temperature myT = new Temperature(Parameter.TEMPERATURE_S1, now, myTVal);
+            TemperatureDto myTDto = new TemperatureDto(myT);
+            template.convertAndSend("/topic/myTemperature", myTDto);
+            Temperature myPrevT = tempRepo.findFirstByParamIsOrderByTimeDesc(Parameter.TEMPERATURE_S1);
+//            if (myPrevT == null || Temperature.isModuled(myT, myPrevT)) {
+//                tempRepo.save(myT);
+//            }
+
             float t1Val = (float) regs[0] / 10;
             Temperature t1 = new Temperature(Parameter.TEMPERATURE_S1, now, t1Val);
             TemperatureDto t1Dto = new TemperatureDto(t1);
@@ -100,6 +106,16 @@ public class RautControllerDriver {
                 tempRepo.save(t2);
             }
 
+            float humVal = (float) regs[1] / 10;
+            humVal = humVal + 20F;
+            Humidity h = new Humidity(Parameter.HUMIDITY, now, humVal);
+            HumidityDto hDto = new HumidityDto(h);
+            template.convertAndSend("/topic/temperature2", hDto);
+            Humidity prevHum = humidityRepo.findFirstByParamIsOrderByTimeDesc(Parameter.HUMIDITY);
+            if(prevHum == null || Humidity.isModuled(h, prevHum)){
+                humidityRepo.save(h);
+            }
+
             float stVal = (float) regs[2] / 10;
             SetTemperature st = new SetTemperature(Parameter.SET_TEMPERATURE, now, stVal);
             SetTemperatureDto stDto = new SetTemperatureDto(st);
@@ -107,6 +123,15 @@ public class RautControllerDriver {
             SetTemperature prevSt = setTemperatureRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_TEMPERATURE);
             if (prevSt == null || SetTemperature.isModuled(st, prevSt)) {
                 setTemperatureRepo.save(st);
+            }
+
+            float myStVal = (float) regs[2] / 10;
+            SetTemperature mySt = new SetTemperature(Parameter.SET_TEMPERATURE, now, myStVal);
+            SetTemperatureDto myStDto = new SetTemperatureDto(mySt);
+            template.convertAndSend("/topic/mySet_temperature", myStDto);
+            SetTemperature myPrevSt = setTemperatureRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_TEMPERATURE);
+            if (myPrevSt == null || SetTemperature.isModuled(mySt, myPrevSt)) {
+                setTemperatureRepo.save(mySt);
             }
 
             float vVal = regs[3] == 2 ? 1F : 0F;
@@ -144,6 +169,28 @@ public class RautControllerDriver {
     public SetTemperatureDto decSetTemperature(SetTemperatureDto stDto) throws Exception {
         stDto.setTime(LocalDateTime.now());
         stDto.setValue(stDto.getValue() - 1.0F);
+        master.writeSingleRegister(1, 2, (int) stDto.getValue().floatValue() * 10);
+        SetTemperature st = new SetTemperature(Parameter.SET_TEMPERATURE, stDto.getTime(), stDto.getValue());
+        setTemperatureRepo.save(st);
+        return stDto;
+    }
+
+    @MessageMapping("/setTemperature/myInc")
+    @SendTo("/topic/mySet_temperature")
+    public SetTemperatureDto myIncSetTemperature(SetTemperatureDto stDto) throws Exception {
+        stDto.setTime(LocalDateTime.now());
+        stDto.setValue(stDto.getValue() + 2.0F);
+        master.writeSingleRegister(1, 2, (int) stDto.getValue().floatValue() * 10);
+        SetTemperature st = new SetTemperature(Parameter.SET_TEMPERATURE, LocalDateTime.now(), stDto.getValue());
+        setTemperatureRepo.save(st);
+        return stDto;
+    }
+
+    @MessageMapping("/setTemperature/myDec")
+    @SendTo("/topic/mySet_temperature")
+    public SetTemperatureDto myDecSetTemperature(SetTemperatureDto stDto) throws Exception {
+        stDto.setTime(LocalDateTime.now());
+        stDto.setValue(stDto.getValue() - 2.0F);
         master.writeSingleRegister(1, 2, (int) stDto.getValue().floatValue() * 10);
         SetTemperature st = new SetTemperature(Parameter.SET_TEMPERATURE, stDto.getTime(), stDto.getValue());
         setTemperatureRepo.save(st);
