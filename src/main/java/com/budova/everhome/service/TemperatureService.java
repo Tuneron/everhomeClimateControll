@@ -17,7 +17,7 @@ public class TemperatureService {
 
     public List<Temperature> getTemperatureForLastDay() {
         LocalDateTime dayBefore = LocalDateTime.now().minusDays(1);
-        return temperatureRepo.findByParamAndTimeAfterOrderByTimeDesc(Parameter.TEMPERATURE_S1, dayBefore);
+        return temperatureRepo.findByParamAndTimeAfterOrderByTimeDesc(Parameter.TEMPERATURE, dayBefore);
     }
 
 }

@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 @Table(indexes = {
         @Index(name = "idx_parameter_id_time", columnList = "parameter_id,time")
 })
-public class Temperature {
+
+public class SetPower{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -17,16 +18,17 @@ public class Temperature {
     private LocalDateTime time;
     private Float value;
 
-    public Temperature() { }
+    public SetPower() {
+    }
 
-    public Temperature(Long id, Parameter param, LocalDateTime time, Float value) {
+    public SetPower(Long id, Parameter param, LocalDateTime time, Float value) {
         this.id = id;
         this.param = param;
         this.time = time;
         this.value = value;
     }
 
-    public Temperature(Parameter param, LocalDateTime time, Float value) {
+    public SetPower(Parameter param, LocalDateTime time, Float value) {
         this.param = param;
         this.time = time;
         this.value = value;
@@ -64,17 +66,17 @@ public class Temperature {
         this.value = value;
     }
 
-    public static boolean isModuled(Temperature v1, Temperature v2, float module, int seconds) {
-        return Math.abs(v1.value - v2.value) > module || Duration.between(v1.time, v2.time).getSeconds() > seconds;
-}
+    public static boolean isModuled(SetPower v1, SetPower v2, int seconds) {
+        return v1.value != v2.value || Duration.between(v1.time, v2.time).getSeconds() > seconds;
+    }
 
-    public static boolean isModuled(Temperature v1, Temperature v2) {
-        return isModuled(v1, v2, 0.5F, 60);
+    public static boolean isModuled(SetPower v1, SetPower v2) {
+        return isModuled(v1, v2, 60);
     }
 
     @Override
     public String toString() {
-        return "Temperature{" +
+        return "SetPower{" +
                 "id=" + id +
                 ", param=" + param +
                 ", time=" + time +

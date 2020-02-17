@@ -6,12 +6,21 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public enum Parameter {
-    TEMPERATURE_S1(1),
-    TEMPERATURE_S2(2),
-    SET_TEMPERATURE(3),
-    VALVE_POSITION(4),
-    RAUT_CONNECTION(5),
-    HUMIDITY(6);
+    RAUT_CONNECTION(1),
+    TEMPERATURE(2),
+    HUMIDITY(3),
+    SET_POWER(4),
+    SET_TEMPERATURE(5),
+    SET_MODE(6),
+    SET_FAN_SPEED(7),
+    SET_FLUGER(8),
+    SET_CUSTOM(9),
+    SET_SETTING(10),
+    SET_CLIMATE_MODE(11),
+    SET_SEASON(12),
+    SET_RADIATOR(13),
+    SET_HUMIDIFIER(14),
+    VALVE_POSITION(15);
 
     private Integer id;
     private String name;

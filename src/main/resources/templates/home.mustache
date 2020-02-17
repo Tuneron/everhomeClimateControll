@@ -18,29 +18,31 @@
     </h2>
 </noscript>
 
-<p>Hum</p>
+<p>Humidity</p>
 <p id="humidity">{{humidity}}</p>
 
-<p>(T1 + 2)</p>
-<p id="myTemperature">{{myTemperature}}</p>
-<p>T1</p>
-<p id="temperature1">{{temperature1}}</p>
-<p>T2</p>
-<p id="temperature2">{{temperature2}}</p>
+<p>Temperature</p>
+<p id="temperature">{{temperature}}</p>
 
+<div class="setBlock">
+<p>Set power</p>
+<div class="row">
+    <p id="set_power">{{set_power}}</p>
+    <button id="onPower">ON</button>
+    <button id="offPower">OFF</button>
+</div>
+</div>
+
+<div class="setBlock">
+<p>Set temperature</p>
 <div class="row">
     <p id="set_temperature">{{set_temperature}}</p>
     <button id="inc">+</button>
     <button id="dec">-</button>
 </div>
-
-<div class="row">
-    <p id="mySet_temperature">{{mySet_temperature}}</p>
-    <button id="myInc">+</button>
-    <button id="myDec">-</button>
 </div>
 
-<p id="valve">{{valve}}</p>
+<p>Connection with raut : </p>
 <p id="connection">{{connection}}</p>
 
 <div class="row">

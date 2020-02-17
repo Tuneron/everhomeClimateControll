@@ -17,6 +17,8 @@ public class HomeController {
     @Autowired
     private TemperatureRepo tempRepo;
     @Autowired
+    private SetPowerRepo setPowerRepo;
+    @Autowired
     private ValvePosRepo valvePosRepo;
     @Autowired
     private SetTemperatureRepo setTemperatureRepo;
@@ -26,20 +28,16 @@ public class HomeController {
     @GetMapping("/home")
     public String home(Model model) {
         Humidity h = humidityRepo.findFirstByParamIsOrderByTimeDesc(Parameter.HUMIDITY);
-        Temperature t1 = tempRepo.findFirstByParamIsOrderByTimeDesc(Parameter.TEMPERATURE_S1);
-        Temperature t2 = tempRepo.findFirstByParamIsOrderByTimeDesc(Parameter.TEMPERATURE_S2);
-        ValvePos v = valvePosRepo.findFirstByParamIsOrderByTimeDesc(Parameter.VALVE_POSITION);
+        Temperature t1 = tempRepo.findFirstByParamIsOrderByTimeDesc(Parameter.TEMPERATURE);
+        SetPower stP = setPowerRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_POWER);
         SetTemperature st = setTemperatureRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_TEMPERATURE);
         Connection c = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
         model.addAttribute("humidity", h != null ? h.getValue() : "null");
-        model.addAttribute("myTemperature", t1 != null ? t1.getValue() : "null");
-        model.addAttribute("temperature1", t1 != null ? t1.getValue() : "null");
-        model.addAttribute("temperature2", t2 != null ? t2.getValue() : "null");
+        model.addAttribute("temperature", t1 != null ? t1.getValue() : "null");
+        model.addAttribute("set_power", stP != null ? stP.getValue() : "null");
         model.addAttribute("set_temperature", st != null ? st.getValue() : "null");
-        model.addAttribute("mySet_temperature", st != null ? st.getValue() : "null");
-        model.addAttribute("valve", v != null ? v.getValue() : "null");
         model.addAttribute("connection", c != null ? c.getValue() : "null");
-        List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE_S1);
+        List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE);
         StringBuilder sb = new StringBuilder();
         for (Temperature t : temps) {
             sb.append(t.toString());
