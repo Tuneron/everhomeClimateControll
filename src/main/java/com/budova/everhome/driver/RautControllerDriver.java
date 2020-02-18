@@ -38,6 +38,8 @@ public class RautControllerDriver {
     private SetTemperatureRepo setTemperatureRepo;
     @Autowired
     private SetConditionerModeRepo setConditionerModeRepo;
+    @Autowired
+    private SetFanSpeedRepo setFanSpeedRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -121,8 +123,15 @@ public class RautControllerDriver {
             SetConditionerMode setConditionerMode = new SetConditionerMode(Parameter.SET_CONDITIONER_MODE, now, setConditionerModeVal);
             SetConditionerModeDto setConditionerModeDto = new SetConditionerModeDto(setConditionerMode);
             template.convertAndSend("/topic/set_conditioner_mode", setConditionerModeDto);
-            SetConditionerMode prevSetConditionerMode = setConditionerModeRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CONDITIONER_MODE);             //TODO возможны ошибки при работе
+            SetConditionerMode prevSetConditionerMode = setConditionerModeRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CONDITIONER_MODE);
             setConditionerModeRepo.save(setConditionerMode);
+
+            float setFanSpeedVal = (float) regs[5];
+            SetFanSpeed setFanSpeed = new SetFanSpeed(Parameter.SET_FAN_SPEED, now, setFanSpeedVal);
+            SetFanSpeedDto setFanSpeedDto = new SetFanSpeedDto(setFanSpeed);
+            template.convertAndSend("/topic/set_fan_speed", setFanSpeedDto);
+            SetFanSpeed prevSetFanSpeed = setFanSpeedRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_FAN_SPEED);
+            setFanSpeedRepo.save(setFanSpeed);
 
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, false);
@@ -199,5 +208,27 @@ public class RautControllerDriver {
         SetConditionerMode setConditionerMode = new SetConditionerMode(Parameter.SET_CONDITIONER_MODE, setConditionerModeDto.getTime(), setConditionerModeDto.getValue());
         setConditionerModeRepo.save(setConditionerMode);
         return setConditionerModeDto;
+    }
+
+    @MessageMapping("/setFanSpeed/incFanSpeed")
+    @SendTo("/topic/set_fan_speed")
+    public SetFanSpeedDto incSetFanSpeed(SetFanSpeedDto setFanSpeedDto) throws Exception{
+        setFanSpeedDto.setTime(LocalDateTime.now());
+        setFanSpeedDto.setValue(SetFanSpeed.inBorder(setFanSpeedDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 5, (int) setFanSpeedDto.getValue().floatValue());
+        SetFanSpeed setFanSpeed = new SetFanSpeed(Parameter.SET_FAN_SPEED, setFanSpeedDto.getTime(), setFanSpeedDto.getValue());
+        setFanSpeedRepo.save(setFanSpeed);
+        return  setFanSpeedDto;
+    }
+
+    @MessageMapping("/setFanSpeed/decFanSpeed")
+    @SendTo("/topic/set_fan_speed")
+    public SetFanSpeedDto decSetFanSpeed(SetFanSpeedDto setFanSpeedDto) throws Exception{
+        setFanSpeedDto.setTime(LocalDateTime.now());
+        setFanSpeedDto.setValue(SetFanSpeed.inBorder(setFanSpeedDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 5, (int) setFanSpeedDto.getValue().floatValue());
+        SetFanSpeed setFanSpeed = new SetFanSpeed(Parameter.SET_FAN_SPEED, setFanSpeedDto.getTime(), setFanSpeedDto.getValue());
+        setFanSpeedRepo.save(setFanSpeed);
+        return  setFanSpeedDto;
     }
 }

@@ -34,6 +34,11 @@ function connect() {
              updateSetConditionerMode(setConditionerMode.value);
         });
 
+        stompClient.subscribe('/topic/set_fan_speed', setFanSpeed => {
+        var setFanSpeed = JSON.parse(setFanSpeed.body);
+        updateSetFanSpeed(setFanSpeed.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -55,6 +60,9 @@ function updateSetTemperature(value) {
 }
 function updateSetConditionerMode(value) {
     $("#set_conditioner_mode").text(value);
+}
+function updateSetFanSpeed(value){
+    $("#set_fan_speed").text(value);
 }
 function updateConnection(value) {
     $("#connection").text(value);
@@ -90,6 +98,16 @@ function setConditionerMode(value, dir) {
     );
 }
 
+function setFanSpeed(value, dir){
+    stompClient.send("/app/setFanSpeed/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_fan_speed").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -111,6 +129,12 @@ $(function () {
     });
     $("#decConditionerMode").click(() => {
         setConditionerMode($("#set_conditioner_mode").val(), "decConditionerMode");
+    });
+    $("#incFanSpeed").click(() => {
+        setFanSpeed($("#set_fan_speed").val(), "incFanSpeed");
+    });
+    $("#decFanSpeed").click(() => {
+        setFanSpeed($("#set_fan_speed").val(), "decFanSpeed");
     });
 });
 

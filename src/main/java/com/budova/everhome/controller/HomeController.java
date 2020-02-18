@@ -25,6 +25,8 @@ public class HomeController {
     @Autowired
     private SetConditionerModeRepo setConditionerModeRepo;
     @Autowired
+    private SetFanSpeedRepo setFanSpeedRepo;
+    @Autowired
     private ConnectionRepo connectionRepo;
 
     @GetMapping("/home")
@@ -34,12 +36,14 @@ public class HomeController {
         SetPower stP = setPowerRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_POWER);
         SetTemperature st = setTemperatureRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_TEMPERATURE);
         SetConditionerMode setConditionerMode = setConditionerModeRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CONDITIONER_MODE);
+        SetFanSpeed setFanSpeed = setFanSpeedRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_FAN_SPEED);
         Connection c = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
         model.addAttribute("humidity", h != null ? h.getValue() : "null");
         model.addAttribute("temperature", t1 != null ? t1.getValue() : "null");
         model.addAttribute("set_power", stP != null ? stP.getValue() : "null");
         model.addAttribute("set_temperature", st != null ? st.getValue() : "null");
         model.addAttribute("set_conditioner_mode", setConditionerMode != null ? setConditionerMode.getValue() : "null");
+        model.addAttribute("set_fan_speed", setFanSpeed != null ? setFanSpeed.getValue() : "null");
         model.addAttribute("connection", c != null ? c.getValue() : "null");
         List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE);
         StringBuilder sb = new StringBuilder();
