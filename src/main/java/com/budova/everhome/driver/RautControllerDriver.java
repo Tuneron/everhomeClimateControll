@@ -39,6 +39,8 @@ public class RautControllerDriver {
     @Autowired
     private SetConditionerModeRepo setConditionerModeRepo;
     @Autowired
+    private SetFlugerRepo setFlugerRepo;
+    @Autowired
     private SetFanSpeedRepo setFanSpeedRepo;
 
     @Autowired
@@ -78,7 +80,7 @@ public class RautControllerDriver {
             ConnectionDto cDto = new ConnectionDto(c);
             template.convertAndSend("/topic/connection", cDto);
             Connection prevC = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
-            if(prevC == null || Connection.isModuled(prevC, c)) {
+            if (prevC == null || Connection.isModuled(prevC, c)) {
                 connectionRepo.save(c);
             }
 
@@ -97,7 +99,7 @@ public class RautControllerDriver {
             HumidityDto hDto = new HumidityDto(h);
             template.convertAndSend("/topic/humidity", hDto);
             Humidity prevHum = humidityRepo.findFirstByParamIsOrderByTimeDesc(Parameter.HUMIDITY);
-            if(prevHum == null || Humidity.isModuled(h, prevHum)){
+            if (prevHum == null || Humidity.isModuled(h, prevHum)) {
                 humidityRepo.save(h);
             }
 
@@ -106,7 +108,7 @@ public class RautControllerDriver {
             SetPowerDto setPowerDto = new SetPowerDto(setPower);
             template.convertAndSend("/topic/set_power", setPowerDto);
             SetPower prevSetPower = setPowerRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_POWER);
-            if(prevSetPower == null || SetPower.isModuled(setPower, prevSetPower)){
+            if (prevSetPower == null || SetPower.isModuled(setPower, prevSetPower)) {
                 setPowerRepo.save(setPower);
             }
 
@@ -133,15 +135,23 @@ public class RautControllerDriver {
             SetFanSpeed prevSetFanSpeed = setFanSpeedRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_FAN_SPEED);
             setFanSpeedRepo.save(setFanSpeed);
 
+            float setFlugerVal = (float) regs[6];
+            SetFluger setFluger = new SetFluger(Parameter.SET_FLUGER, now, setFlugerVal);
+            SetFlugerDto setFlugerDto = new SetFlugerDto(setFluger);
+            template.convertAndSend("/topic/set_fluger", setFlugerDto);
+            SetFluger prevSetFluger = setFlugerRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_FLUGER);
+            setFlugerRepo.save(setFluger);
+
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, false);
             ConnectionDto cDto = new ConnectionDto(c);
             template.convertAndSend("/topic/connection", cDto);
             Connection prevC = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
-            if(prevC == null || Connection.isModuled(prevC, c)) {
+            if (prevC == null || Connection.isModuled(prevC, c)) {
                 connectionRepo.save(c);
             }
-            System.err.println(e);        }
+            System.err.println(e);
+        }
     }
 
     @MessageMapping("/setPower/onPower")
@@ -212,23 +222,45 @@ public class RautControllerDriver {
 
     @MessageMapping("/setFanSpeed/incFanSpeed")
     @SendTo("/topic/set_fan_speed")
-    public SetFanSpeedDto incSetFanSpeed(SetFanSpeedDto setFanSpeedDto) throws Exception{
+    public SetFanSpeedDto incSetFanSpeed(SetFanSpeedDto setFanSpeedDto) throws Exception {
         setFanSpeedDto.setTime(LocalDateTime.now());
         setFanSpeedDto.setValue(SetFanSpeed.inBorder(setFanSpeedDto.getValue().floatValue() + 1F));
         master.writeSingleRegister(1, 5, (int) setFanSpeedDto.getValue().floatValue());
         SetFanSpeed setFanSpeed = new SetFanSpeed(Parameter.SET_FAN_SPEED, setFanSpeedDto.getTime(), setFanSpeedDto.getValue());
         setFanSpeedRepo.save(setFanSpeed);
-        return  setFanSpeedDto;
+        return setFanSpeedDto;
     }
 
     @MessageMapping("/setFanSpeed/decFanSpeed")
     @SendTo("/topic/set_fan_speed")
-    public SetFanSpeedDto decSetFanSpeed(SetFanSpeedDto setFanSpeedDto) throws Exception{
+    public SetFanSpeedDto decSetFanSpeed(SetFanSpeedDto setFanSpeedDto) throws Exception {
         setFanSpeedDto.setTime(LocalDateTime.now());
         setFanSpeedDto.setValue(SetFanSpeed.inBorder(setFanSpeedDto.getValue().floatValue() - 1F));
         master.writeSingleRegister(1, 5, (int) setFanSpeedDto.getValue().floatValue());
         SetFanSpeed setFanSpeed = new SetFanSpeed(Parameter.SET_FAN_SPEED, setFanSpeedDto.getTime(), setFanSpeedDto.getValue());
         setFanSpeedRepo.save(setFanSpeed);
-        return  setFanSpeedDto;
+        return setFanSpeedDto;
+    }
+
+    @MessageMapping("/setFluger/incFluger")
+    @SendTo("/topic/set_fluger")
+    public SetFlugerDto incSetFluger(SetFlugerDto setFlugerDto) throws Exception {
+        setFlugerDto.setTime(LocalDateTime.now());
+        setFlugerDto.setValue(SetFluger.inBorder(setFlugerDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 6, (int) setFlugerDto.getValue().floatValue());
+        SetFluger setFluger = new SetFluger(Parameter.SET_FLUGER, setFlugerDto.getTime(), setFlugerDto.getValue());
+        setFlugerRepo.save(setFluger);
+        return setFlugerDto;
+    }
+
+    @MessageMapping("/setFluger/decFluger")
+    @SendTo("/topic/set_fluger")
+    public SetFlugerDto decSetFluger(SetFlugerDto setFlugerDto) throws Exception {
+        setFlugerDto.setTime(LocalDateTime.now());
+        setFlugerDto.setValue(SetFluger.inBorder(setFlugerDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 6, (int) setFlugerDto.getValue().floatValue());
+        SetFluger setFluger = new SetFluger(Parameter.SET_FLUGER, setFlugerDto.getTime(), setFlugerDto.getValue());
+        setFlugerRepo.save(setFluger);
+        return setFlugerDto;
     }
 }

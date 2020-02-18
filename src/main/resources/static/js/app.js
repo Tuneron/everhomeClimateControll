@@ -34,9 +34,14 @@ function connect() {
              updateSetConditionerMode(setConditionerMode.value);
         });
 
-        stompClient.subscribe('/topic/set_fan_speed', setFanSpeed => {
-        var setFanSpeed = JSON.parse(setFanSpeed.body);
-        updateSetFanSpeed(setFanSpeed.value);
+        stompClient.subscribe('/topic/set_fan_speed', setFanSp => {
+             var setFanSpeed = JSON.parse(setFanSp.body);
+             updateSetFanSpeed(setFanSpeed.value);
+        });
+
+        stompClient.subscribe('/topic/set_fluger', setFl => {
+             var setFluger = JSON.parse(setFl.body);
+             updateSetFluger(setFluger.value);
         });
 
         stompClient.subscribe('/topic/connection', v => {
@@ -63,6 +68,9 @@ function updateSetConditionerMode(value) {
 }
 function updateSetFanSpeed(value){
     $("#set_fan_speed").text(value);
+}
+function updateSetFluger(value){
+    $("#set_fluger").text(value);
 }
 function updateConnection(value) {
     $("#connection").text(value);
@@ -108,6 +116,17 @@ function setFanSpeed(value, dir){
     );
 }
 
+function setFluger(value, dir){
+    stompClient.send("/app/setFluger/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_fluger").text())
+            }
+        )
+    );
+}
+
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -135,6 +154,12 @@ $(function () {
     });
     $("#decFanSpeed").click(() => {
         setFanSpeed($("#set_fan_speed").val(), "decFanSpeed");
+    });
+    $("#incFluger").click(() => {
+        setFluger($("#set_fluger").val(), "incFluger");
+    });
+    $("#decFluger").click(() => {
+        setFluger($("#set_fluger").val(), "decFluger");
     });
 });
 

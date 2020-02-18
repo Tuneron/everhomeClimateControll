@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_parameter_id_time", columnList = "parameter_id,time")
 })
 
-public class SetFanSpeed {
+public class SetFluger {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -16,20 +16,20 @@ public class SetFanSpeed {
     private Parameter param;
     private LocalDateTime time;
     private Float value;
-    private static final float MIN_VALUE = 0F;
-    private static final float MAX_VALUE = 6F;
+    private static final float MIN_VALUE = 1F;
+    private static final float MAX_VALUE = 7F;
 
-    public SetFanSpeed() {
+    public SetFluger(){
     }
 
-    public SetFanSpeed(Long id, Parameter param, LocalDateTime time, Float value) {
+    public SetFluger(Long id, Parameter param, LocalDateTime time, Float value) {
         this.id = id;
         this.param = param;
         this.time = time;
         this.value = value;
     }
 
-    public SetFanSpeed(Parameter param, LocalDateTime time, Float value) {
+    public SetFluger(Parameter param, LocalDateTime time, Float value) {
         this.param = param;
         this.time = time;
         this.value = value;
@@ -75,7 +75,7 @@ public class SetFanSpeed {
             return value;
     }
 
-    public static float inBorder(SetFanSpeed value){
+    public static float inBorder(SetFluger value){
         if (value.getValue() < MIN_VALUE) return MIN_VALUE;
         else
         if(value.getValue() > MAX_VALUE) return MAX_VALUE;
@@ -85,7 +85,7 @@ public class SetFanSpeed {
 
     @Override
     public String toString() {
-        return "SetFanSpeed{" +
+        return "SetFluger{" +
                 "id=" + id +
                 ", param=" + param +
                 ", time=" + time +
