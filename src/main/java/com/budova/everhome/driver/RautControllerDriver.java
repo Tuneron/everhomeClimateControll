@@ -27,6 +27,8 @@ import java.time.LocalDateTime;
 public class RautControllerDriver {
 
     @Autowired
+    private ConnectionRepo connectionRepo;
+    @Autowired
     private HumidityRepo humidityRepo;
     @Autowired
     private TemperatureRepo tempRepo;
@@ -35,10 +37,7 @@ public class RautControllerDriver {
     @Autowired
     private SetTemperatureRepo setTemperatureRepo;
     @Autowired
-    private ValvePosRepo valvePosRepo;
-    @Autowired
-    private ConnectionRepo connectionRepo;
-
+    private SetConditionerModeRepo setConditionerModeRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -109,8 +108,8 @@ public class RautControllerDriver {
                 setPowerRepo.save(setPower);
             }
 
-            float stVal = (float) regs[3];
-            SetTemperature st = new SetTemperature(Parameter.SET_TEMPERATURE, now, stVal);
+            float setTemperatureVal = (float) regs[3];
+            SetTemperature st = new SetTemperature(Parameter.SET_TEMPERATURE, now, setTemperatureVal);
             SetTemperatureDto stDto = new SetTemperatureDto(st);
             template.convertAndSend("/topic/set_temperature", stDto);
             SetTemperature prevSt = setTemperatureRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_TEMPERATURE);
@@ -118,14 +117,12 @@ public class RautControllerDriver {
                 setTemperatureRepo.save(st);
             }
 
-//            float vVal = (float) regs[3];
-//            ValvePos v = new ValvePos(Parameter.VALVE_POSITION, now, vVal);
-//            ValvePosDto vDto = new ValvePosDto(v);
-//            template.convertAndSend("/topic/valve", vDto);
-//            ValvePos prevV = valvePosRepo.findFirstByParamIsOrderByTimeDesc(Parameter.VALVE_POSITION);
-//            if (prevV == null || ValvePos.isModuled(v, prevV)) {
-//                valvePosRepo.save(v);
-//            }
+            float setConditionerModeVal = (float) regs[4];
+            SetConditionerMode setConditionerMode = new SetConditionerMode(Parameter.SET_CONDITIONER_MODE, now, setConditionerModeVal);
+            SetConditionerModeDto setConditionerModeDto = new SetConditionerModeDto(setConditionerMode);
+            template.convertAndSend("/topic/set_conditioner_mode", setConditionerModeDto);
+            SetConditionerMode prevSetConditionerMode = setConditionerModeRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CONDITIONER_MODE);             //TODO возможны ошибки при работе
+            setConditionerModeRepo.save(setConditionerMode);
 
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, false);
@@ -164,7 +161,7 @@ public class RautControllerDriver {
     @SendTo("/topic/set_temperature")
     public SetTemperatureDto incSetTemperature(SetTemperatureDto stDto) throws Exception {
         stDto.setTime(LocalDateTime.now());
-        stDto.setValue(stDto.getValue() + 1.0F);
+        stDto.setValue(SetTemperature.inBorder(stDto.getValue() + 1F));
         master.writeSingleRegister(1, 3, (int) stDto.getValue().floatValue());
         SetTemperature st = new SetTemperature(Parameter.SET_TEMPERATURE, LocalDateTime.now(), stDto.getValue());
         setTemperatureRepo.save(st);
@@ -175,13 +172,32 @@ public class RautControllerDriver {
     @SendTo("/topic/set_temperature")
     public SetTemperatureDto decSetTemperature(SetTemperatureDto stDto) throws Exception {
         stDto.setTime(LocalDateTime.now());
-        stDto.setValue(stDto.getValue() - 1.0F);
+        stDto.setValue(SetTemperature.inBorder(stDto.getValue() - 1F));
         master.writeSingleRegister(1, 3, (int) stDto.getValue().floatValue());
         SetTemperature st = new SetTemperature(Parameter.SET_TEMPERATURE, stDto.getTime(), stDto.getValue());
         setTemperatureRepo.save(st);
         return stDto;
     }
 
+    @MessageMapping("/setConditionerMode/incConditionerMode")
+    @SendTo("/topic/set_conditioner_mode")
+    public SetConditionerModeDto incSetConditionerMode(SetConditionerModeDto setConditionerModeDto) throws Exception {
+        setConditionerModeDto.setTime(LocalDateTime.now());
+        setConditionerModeDto.setValue(SetConditionerMode.inBorder(setConditionerModeDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 4, (int) setConditionerModeDto.getValue().floatValue());
+        SetConditionerMode setConditionerMode = new SetConditionerMode(Parameter.SET_CONDITIONER_MODE, setConditionerModeDto.getTime(), setConditionerModeDto.getValue());
+        setConditionerModeRepo.save(setConditionerMode);
+        return setConditionerModeDto;
+    }
 
-
+    @MessageMapping("/setConditionerMode/decConditionerMode")
+    @SendTo("/topic/set_conditioner_mode")
+    public SetConditionerModeDto decSetConditionerMode(SetConditionerModeDto setConditionerModeDto) throws Exception {
+        setConditionerModeDto.setTime(LocalDateTime.now());
+        setConditionerModeDto.setValue(SetConditionerMode.inBorder(setConditionerModeDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 4, (int) setConditionerModeDto.getValue().floatValue());
+        SetConditionerMode setConditionerMode = new SetConditionerMode(Parameter.SET_CONDITIONER_MODE, setConditionerModeDto.getTime(), setConditionerModeDto.getValue());
+        setConditionerModeRepo.save(setConditionerMode);
+        return setConditionerModeDto;
+    }
 }

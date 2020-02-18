@@ -11,7 +11,7 @@ public enum Parameter {
     HUMIDITY(3),
     SET_POWER(4),
     SET_TEMPERATURE(5),
-    SET_MODE(6),
+    SET_CONDITIONER_MODE(6),
     SET_FAN_SPEED(7),
     SET_FLUGER(8),
     SET_CUSTOM(9),
