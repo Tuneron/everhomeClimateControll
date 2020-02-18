@@ -44,6 +44,11 @@ function connect() {
              updateSetFluger(setFluger.value);
         });
 
+        stompClient.subscribe('/topic/set_custom', setCust => {
+             var setCustom = JSON.parse(setCust.body);
+             updateSetCustom(setCustom.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -71,6 +76,9 @@ function updateSetFanSpeed(value){
 }
 function updateSetFluger(value){
     $("#set_fluger").text(value);
+}
+function updateSetCustom(value){
+    $("#set_custom").text(value);
 }
 function updateConnection(value) {
     $("#connection").text(value);
@@ -126,6 +134,16 @@ function setFluger(value, dir){
     );
 }
 
+function setCustom(value, dir){
+    stompClient.send("/app/setCustom/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_custom").text())
+            }
+        )
+    );
+}
+
 
 $(function () {
     $(document).ready(() => {
@@ -160,6 +178,12 @@ $(function () {
     });
     $("#decFluger").click(() => {
         setFluger($("#set_fluger").val(), "decFluger");
+    });
+    $("#incCustom").click(() => {
+        setCustom($("#set_custom").val(), "incCustom");
+    });
+    $("#decCustom").click(() => {
+        setCustom($("#set_custom").val(), "decCustom");
     });
 });
 

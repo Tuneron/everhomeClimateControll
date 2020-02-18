@@ -42,6 +42,8 @@ public class RautControllerDriver {
     private SetFlugerRepo setFlugerRepo;
     @Autowired
     private SetFanSpeedRepo setFanSpeedRepo;
+    @Autowired
+    private SetCustomRepo setCustomRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -141,6 +143,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/set_fluger", setFlugerDto);
             SetFluger prevSetFluger = setFlugerRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_FLUGER);
             setFlugerRepo.save(setFluger);
+
+            float setCustomVal = (float) regs[7];
+            SetCustom setCustom = new SetCustom(Parameter.SET_CUSTOM, now, setCustomVal);
+            SetCustomDto setCustomDto = new SetCustomDto(setCustom);
+            template.convertAndSend("/topic/set_custom", setCustomDto);
+            SetCustom prevSetCustom = setCustomRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CUSTOM);
+            setCustomRepo.save(setCustom);
 
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, false);
@@ -262,5 +271,27 @@ public class RautControllerDriver {
         SetFluger setFluger = new SetFluger(Parameter.SET_FLUGER, setFlugerDto.getTime(), setFlugerDto.getValue());
         setFlugerRepo.save(setFluger);
         return setFlugerDto;
+    }
+
+    @MessageMapping("/setCustom/incCustom")
+    @SendTo("/topic/set_custom")
+    public SetCustomDto incSetCustom(SetCustomDto setCustomDto) throws Exception{
+        setCustomDto.setTime(LocalDateTime.now());
+        setCustomDto.setValue(SetCustom.inBorder(setCustomDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 7, (int) setCustomDto.getValue().floatValue());
+        SetCustom setCustom = new SetCustom(Parameter.SET_CUSTOM, setCustomDto.getTime(), setCustomDto.getValue());
+        setCustomRepo.save(setCustom);
+        return  setCustomDto;
+    }
+
+    @MessageMapping("/setCustom/decCustom")
+    @SendTo("/topic/set_custom")
+    public SetCustomDto decSetCustom(SetCustomDto setCustomDto) throws Exception{
+        setCustomDto.setTime(LocalDateTime.now());
+        setCustomDto.setValue(SetCustom.inBorder(setCustomDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 7, (int) setCustomDto.getValue().floatValue());
+        SetCustom setCustom = new SetCustom(Parameter.SET_CUSTOM, setCustomDto.getTime(), setCustomDto.getValue());
+        setCustomRepo.save(setCustom);
+        return  setCustomDto;
     }
 }
