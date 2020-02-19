@@ -44,6 +44,8 @@ public class RautControllerDriver {
     private SetFanSpeedRepo setFanSpeedRepo;
     @Autowired
     private SetCustomRepo setCustomRepo;
+    @Autowired
+    private SetSettingRepo setSettingRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -150,6 +152,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/set_custom", setCustomDto);
             SetCustom prevSetCustom = setCustomRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CUSTOM);
             setCustomRepo.save(setCustom);
+
+            float setSettingVal = (float) regs[8];
+            SetSetting setSetting = new SetSetting(Parameter.SET_SETTING, now, setSettingVal);
+            SetSettingDto setSettingDto = new SetSettingDto(setSetting);
+            template.convertAndSend("/topic/set_setting", setSettingDto);
+            SetSetting prevSetSetting = setSettingRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SETTING);
+            setSettingRepo.save(setSetting);
 
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, false);
@@ -293,5 +302,27 @@ public class RautControllerDriver {
         SetCustom setCustom = new SetCustom(Parameter.SET_CUSTOM, setCustomDto.getTime(), setCustomDto.getValue());
         setCustomRepo.save(setCustom);
         return  setCustomDto;
+    }
+
+    @MessageMapping("/setSetting/incSetting")
+    @SendTo("/topic/set_setting")
+    public SetSettingDto incSetSetting(SetSettingDto setSettingDto) throws Exception{
+        setSettingDto.setTime(LocalDateTime.now());
+        setSettingDto.setValue(SetSetting.inBorder(setSettingDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 8, (int) setSettingDto.getValue().floatValue());
+        SetSetting setSetting = new SetSetting(Parameter.SET_SETTING, setSettingDto.getTime(), setSettingDto.getValue());
+        setSettingRepo.save(setSetting);
+        return setSettingDto;
+    }
+
+    @MessageMapping("/setSetting/decSetting")
+    @SendTo("/topic/set_setting")
+    public SetSettingDto decSetSetting(SetSettingDto setSettingDto) throws Exception{
+        setSettingDto.setTime(LocalDateTime.now());
+        setSettingDto.setValue(SetSetting.inBorder(setSettingDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 8, (int) setSettingDto.getValue().floatValue());
+        SetSetting setSetting = new SetSetting(Parameter.SET_SETTING, setSettingDto.getTime(), setSettingDto.getValue());
+        setSettingRepo.save(setSetting);
+        return setSettingDto;
     }
 }

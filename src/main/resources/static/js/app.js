@@ -49,6 +49,11 @@ function connect() {
              updateSetCustom(setCustom.value);
         });
 
+        stompClient.subscribe('/topic/set_setting', setSetr => {
+             var setSetting= JSON.parse(setSetr.body);
+             updateSetSetting(setSetting.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -79,6 +84,9 @@ function updateSetFluger(value){
 }
 function updateSetCustom(value){
     $("#set_custom").text(value);
+}
+function updateSetSetting(value){
+    $("#set_setting").text(value);
 }
 function updateConnection(value) {
     $("#connection").text(value);
@@ -144,6 +152,16 @@ function setCustom(value, dir){
     );
 }
 
+function setSetting(value, dir){
+    stompClient.send("/app/setSetting/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_setting").text())
+            }
+        )
+    );
+}
+
 
 $(function () {
     $(document).ready(() => {
@@ -184,6 +202,12 @@ $(function () {
     });
     $("#decCustom").click(() => {
         setCustom($("#set_custom").val(), "decCustom");
+    });
+    $("#incSetting").click(() => {
+        setSetting($("#set_setting").val(), "incSetting");
+    });
+    $("#decSetting").click(() => {
+        setSetting($("#set_setting").val(), "decSetting");
     });
 });
 

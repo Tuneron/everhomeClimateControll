@@ -31,6 +31,8 @@ public class HomeController {
     @Autowired
     private SetCustomRepo setCustomRepo;
     @Autowired
+    private SetSettingRepo setSettingRepo;
+    @Autowired
     private ConnectionRepo connectionRepo;
 
     @GetMapping("/home")
@@ -43,6 +45,7 @@ public class HomeController {
         SetFanSpeed setFanSpeed = setFanSpeedRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_FAN_SPEED);
         SetFluger setFluger = setFlugerRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_FLUGER);
         SetCustom setCustom = setCustomRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CUSTOM);
+        SetSetting setSetting = setSettingRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SETTING);
         Connection c = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
         model.addAttribute("humidity", h != null ? h.getValue() : "null");
         model.addAttribute("temperature", t1 != null ? t1.getValue() : "null");
@@ -52,6 +55,7 @@ public class HomeController {
         model.addAttribute("set_fan_speed", setFanSpeed != null ? setFanSpeed.getValue() : "null");
         model.addAttribute("set_fluger", setFluger != null ? setFluger.getValue() : "null");
         model.addAttribute("set_custom", setCustom != null ? setCustom.getValue() : "null");
+        model.addAttribute("set_setting", setSetting != null ? setSetting.getValue() : "null");
         model.addAttribute("connection", c != null ? c.getValue() : "null");
         List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE);
         StringBuilder sb = new StringBuilder();
