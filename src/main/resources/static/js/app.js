@@ -69,6 +69,11 @@ function connect() {
              updateSetRadiator(setRadiator.value);
         });
 
+        stompClient.subscribe('/topic/set_humidifier', setHum => {
+             var setHumidifier = JSON.parse(setHum.body);
+             updateSetHumidifier(setHumidifier.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -111,6 +116,9 @@ function updateSetSeason(value){
 }
 function updateSetRadiator(value){
     $("#set_radiator").text(value);
+}
+function updateSetHumidifier(value){
+    $("#set_humidifier").text(value);
 }
 function updateConnection(value) {
     $("#connection").text(value);
@@ -216,6 +224,17 @@ function setRadiator(value, dir){
     );
 }
 
+function setHumidifier(value, dir){
+    stompClient.send("/app/setHumidifier/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_humidifier").text())
+            }
+        )
+    );
+}
+
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -279,6 +298,12 @@ $(function () {
     });
     $("#decRadiator").click(() => {
         setRadiator($("#set_radiator").val(), "decRadiator");
+    });
+    $("#incHumidifier").click(() => {
+        setHumidifier($("#set_humidifier").val(), "incHumidifier");
+    });
+    $("#decHumidifier").click(() => {
+        setHumidifier($("#set_humidifier").val(), "decHumidifier");
     });
 });
 
