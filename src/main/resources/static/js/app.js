@@ -59,6 +59,11 @@ function connect() {
              updateSetClimateMode(setClimateMode.value);
         });
 
+        stompClient.subscribe('/topic/set_season', setSea => {
+             var setSeason = JSON.parse(setSea.body);
+             updateSetSeason(setSeason.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -95,6 +100,9 @@ function updateSetSetting(value){
 }
 function updateSetClimateMode(value){
     $("#set_climate_mode").text(value);
+}
+function updateSetSeason(value){
+    $("#set_season").text(value);
 }
 function updateConnection(value) {
     $("#connection").text(value);
@@ -180,6 +188,16 @@ function setClimateMode(value, dir){
     );
 }
 
+function setSeason(value, dir){
+    stompClient.send("/app/setSeason/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_season").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -231,6 +249,12 @@ $(function () {
     });
     $("#decClimateMode").click(() => {
         setClimateMode($("#set_climate_mode").val(), "decClimateMode");
+    });
+    $("#incSeason").click(() => {
+        setSeason($("#set_season").val(), "incSeason");
+    });
+    $("#decSeason").click(() => {
+        setSeason($("#set_season").val(), "decSeason");
     });
 });
 

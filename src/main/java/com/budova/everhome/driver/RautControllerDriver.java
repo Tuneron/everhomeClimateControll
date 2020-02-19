@@ -48,6 +48,8 @@ public class RautControllerDriver {
     private SetSettingRepo setSettingRepo;
     @Autowired
     private SetClimateModeRepo setClimateModeRepo;
+    @Autowired
+    private SetSeasonRepo setSeasonRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -168,6 +170,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/set_climate_mode", setClimateModeDto);
             SetClimateMode prevSetClimateMode = setClimateModeRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CLIMATE_MODE);
             setClimateModeRepo.save(setClimateMode);
+
+            float setSeasonVal = (float) regs[10];
+            SetSeason setSeason = new SetSeason(Parameter.SET_SEASON, now, setSeasonVal);
+            SetSeasonDto setSeasonDto = new SetSeasonDto(setSeason);
+            template.convertAndSend("/topic/set_season", setSeasonDto);
+            SetSeason prevSetSeason = setSeasonRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SEASON);
+            setSeasonRepo.save(setSeason);
 
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, false);
@@ -355,5 +364,27 @@ public class RautControllerDriver {
         SetClimateMode setClimateMode = new SetClimateMode(Parameter.SET_CLIMATE_MODE, setClimateModeDto.getTime(), setClimateModeDto.getValue());
         setClimateModeRepo.save(setClimateMode);
         return setClimateModeDto;
+    }
+
+    @MessageMapping("/setSeason/incSeason")
+    @SendTo("/topic/set_season")
+    public SetSeasonDto incSetSeason(SetSeasonDto setSeasonDto) throws Exception{
+        setSeasonDto.setTime(LocalDateTime.now());
+        setSeasonDto.setValue(SetSeason.inBorder(setSeasonDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 10, (int) setSeasonDto.getValue().floatValue());
+        SetSeason setSeason = new SetSeason(Parameter.SET_SEASON, setSeasonDto.getTime(), setSeasonDto.getValue());
+        setSeasonRepo.save(setSeason);
+        return setSeasonDto;
+    }
+
+    @MessageMapping("/setSeason/decSeason")
+    @SendTo("/topic/set_season")
+    public SetSeasonDto decSetSeason(SetSeasonDto setSeasonDto) throws Exception{
+        setSeasonDto.setTime(LocalDateTime.now());
+        setSeasonDto.setValue(SetSeason.inBorder(setSeasonDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 10, (int) setSeasonDto.getValue().floatValue());
+        SetSeason setSeason = new SetSeason(Parameter.SET_SEASON, setSeasonDto.getTime(), setSeasonDto.getValue());
+        setSeasonRepo.save(setSeason);
+        return setSeasonDto;
     }
 }

@@ -35,6 +35,8 @@ public class HomeController {
     @Autowired
     private SetClimateModeRepo setClimateModeRepo;
     @Autowired
+    private SetSeasonRepo setSeasonRepo;
+    @Autowired
     private ConnectionRepo connectionRepo;
 
     @GetMapping("/home")
@@ -49,6 +51,7 @@ public class HomeController {
         SetCustom setCustom = setCustomRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CUSTOM);
         SetSetting setSetting = setSettingRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SETTING);
         SetClimateMode setClimateMode = setClimateModeRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CLIMATE_MODE);
+        SetSeason setSeason = setSeasonRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SEASON);
         Connection c = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
         model.addAttribute("humidity", h != null ? h.getValue() : "null");
         model.addAttribute("temperature", t1 != null ? t1.getValue() : "null");
@@ -60,6 +63,7 @@ public class HomeController {
         model.addAttribute("set_custom", setCustom != null ? setCustom.getValue() : "null");
         model.addAttribute("set_setting", setSetting != null ? setSetting.getValue() : "null");
         model.addAttribute("set_climate_mode", setClimateMode != null ? setClimateMode.getValue() : "null");
+        model.addAttribute("set_season", setSeason != null ? setSeason.getValue() : "null");
         model.addAttribute("connection", c != null ? c.getValue() : "null");
         List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE);
         StringBuilder sb = new StringBuilder();
