@@ -7,5 +7,4 @@ import org.springframework.data.repository.CrudRepository;
 public interface SetTemperatureRepo extends CrudRepository<SetTemperature, Long> {
 
     SetTemperature findFirstByParamIsOrderByTimeDesc(Parameter param);
-
 }

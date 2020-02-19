@@ -1,7 +1,6 @@
 package com.budova.everhome.domain;
 
 import javax.persistence.*;
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
@@ -9,7 +8,8 @@ import java.time.LocalDateTime;
         @Index(name = "idx_parameter_id_time", columnList = "parameter_id,time")
 })
 
-public class SetTemperature {
+public class SetClimateMode {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -17,19 +17,21 @@ public class SetTemperature {
     private Parameter param;
     private LocalDateTime time;
     private Float value;
-    private static final float MIN_VALUE = 16F;
-    private static final float MAX_VALUE = 31F;
+    private static final float MIN_VALUE = 0F;
+    private static final float MAX_VALUE = 1F;
 
-    public SetTemperature() { }
+    public SetClimateMode(){
 
-    public SetTemperature(Long id, Parameter param, LocalDateTime time, Float value) {
+    }
+
+    public SetClimateMode(Long id, Parameter param, LocalDateTime time, Float value) {
         this.id = id;
         this.param = param;
         this.time = time;
         this.value = value;
     }
 
-    public SetTemperature(Parameter param, LocalDateTime time, Float value) {
+    public SetClimateMode(Parameter param, LocalDateTime time, Float value) {
         this.param = param;
         this.time = time;
         this.value = value;
@@ -67,23 +69,15 @@ public class SetTemperature {
         this.value = value;
     }
 
-    public static boolean isModuled(SetTemperature v1, SetTemperature v2, float module, int seconds) {
-        return Math.abs(v1.value - v2.value) > module || Duration.between(v1.time, v2.time).getSeconds() > seconds;
-    }
-
-    public static boolean isModuled(SetTemperature v1, SetTemperature v2) {
-        return isModuled(v1, v2, 0.5F, 300);
-    }
-
     public static float inBorder(float value){
         if (value < MIN_VALUE) return MIN_VALUE;
         else
-            if(value > MAX_VALUE) return MAX_VALUE;
-            else
-                return value;
+        if(value > MAX_VALUE) return MAX_VALUE;
+        else
+            return value;
     }
 
-    public static float inBorder(SetTemperature value){
+    public static float inBorder(SetClimateMode value){
         if (value.getValue() < MIN_VALUE) return MIN_VALUE;
         else
         if(value.getValue() > MAX_VALUE) return MAX_VALUE;
@@ -93,7 +87,7 @@ public class SetTemperature {
 
     @Override
     public String toString() {
-        return "SetTemperature{" +
+        return "SetClimateMode{" +
                 "id=" + id +
                 ", param=" + param +
                 ", time=" + time +

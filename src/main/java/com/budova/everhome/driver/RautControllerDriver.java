@@ -46,6 +46,8 @@ public class RautControllerDriver {
     private SetCustomRepo setCustomRepo;
     @Autowired
     private SetSettingRepo setSettingRepo;
+    @Autowired
+    private SetClimateModeRepo setClimateModeRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -159,6 +161,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/set_setting", setSettingDto);
             SetSetting prevSetSetting = setSettingRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SETTING);
             setSettingRepo.save(setSetting);
+
+            float setClimateModeVal = (float) regs[9];
+            SetClimateMode setClimateMode = new SetClimateMode(Parameter.SET_CLIMATE_MODE, now, setClimateModeVal);
+            SetClimateModeDto setClimateModeDto = new SetClimateModeDto(setClimateMode);
+            template.convertAndSend("/topic/set_climate_mode", setClimateModeDto);
+            SetClimateMode prevSetClimateMode = setClimateModeRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_CLIMATE_MODE);
+            setClimateModeRepo.save(setClimateMode);
 
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, false);
@@ -324,5 +333,27 @@ public class RautControllerDriver {
         SetSetting setSetting = new SetSetting(Parameter.SET_SETTING, setSettingDto.getTime(), setSettingDto.getValue());
         setSettingRepo.save(setSetting);
         return setSettingDto;
+    }
+
+    @MessageMapping("/setClimateMode/incClimateMode")
+    @SendTo("/topic/set_climate_mode")
+    public SetClimateModeDto incSetClimateMode(SetClimateModeDto setClimateModeDto) throws Exception{
+        setClimateModeDto.setTime(LocalDateTime.now());
+        setClimateModeDto.setValue(SetClimateMode.inBorder(setClimateModeDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 9, (int) setClimateModeDto.getValue().floatValue());
+        SetClimateMode setClimateMode = new SetClimateMode(Parameter.SET_CLIMATE_MODE, setClimateModeDto.getTime(), setClimateModeDto.getValue());
+        setClimateModeRepo.save(setClimateMode);
+        return setClimateModeDto;
+    }
+
+    @MessageMapping("/setClimateMode/decClimateMode")
+    @SendTo("/topic/set_climate_mode")
+    public SetClimateModeDto decSetClimateMode(SetClimateModeDto setClimateModeDto) throws Exception{
+        setClimateModeDto.setTime(LocalDateTime.now());
+        setClimateModeDto.setValue(SetClimateMode.inBorder(setClimateModeDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 9, (int) setClimateModeDto.getValue().floatValue());
+        SetClimateMode setClimateMode = new SetClimateMode(Parameter.SET_CLIMATE_MODE, setClimateModeDto.getTime(), setClimateModeDto.getValue());
+        setClimateModeRepo.save(setClimateMode);
+        return setClimateModeDto;
     }
 }

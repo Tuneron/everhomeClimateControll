@@ -50,8 +50,13 @@ function connect() {
         });
 
         stompClient.subscribe('/topic/set_setting', setSetr => {
-             var setSetting= JSON.parse(setSetr.body);
+             var setSetting = JSON.parse(setSetr.body);
              updateSetSetting(setSetting.value);
+        });
+
+        stompClient.subscribe('/topic/set_climate_mode', setClimMode => {
+             var setClimateMode = JSON.parse(setClimMode.body);
+             updateSetClimateMode(setClimateMode.value);
         });
 
         stompClient.subscribe('/topic/connection', v => {
@@ -87,6 +92,9 @@ function updateSetCustom(value){
 }
 function updateSetSetting(value){
     $("#set_setting").text(value);
+}
+function updateSetClimateMode(value){
+    $("#set_climate_mode").text(value);
 }
 function updateConnection(value) {
     $("#connection").text(value);
@@ -162,6 +170,15 @@ function setSetting(value, dir){
     );
 }
 
+function setClimateMode(value, dir){
+    stompClient.send("/app/setClimateMode/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_climate_mode").text())
+            }
+        )
+    );
+}
 
 $(function () {
     $(document).ready(() => {
@@ -208,6 +225,12 @@ $(function () {
     });
     $("#decSetting").click(() => {
         setSetting($("#set_setting").val(), "decSetting");
+    });
+    $("#incClimateMode").click(() => {
+        setClimateMode($("#set_climate_mode").val(), "incClimateMode");
+    });
+    $("#decClimateMode").click(() => {
+        setClimateMode($("#set_climate_mode").val(), "decClimateMode");
     });
 });
 
