@@ -64,6 +64,11 @@ function connect() {
              updateSetSeason(setSeason.value);
         });
 
+        stompClient.subscribe('/topic/set_radiator', setRad => {
+             var setRadiator = JSON.parse(setRad.body);
+             updateSetRadiator(setRadiator.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -103,6 +108,9 @@ function updateSetClimateMode(value){
 }
 function updateSetSeason(value){
     $("#set_season").text(value);
+}
+function updateSetRadiator(value){
+    $("#set_radiator").text(value);
 }
 function updateConnection(value) {
     $("#connection").text(value);
@@ -198,6 +206,16 @@ function setSeason(value, dir){
     );
 }
 
+function setRadiator(value, dir){
+    stompClient.send("/app/setRadiator/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_radiator").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -255,6 +273,12 @@ $(function () {
     });
     $("#decSeason").click(() => {
         setSeason($("#set_season").val(), "decSeason");
+    });
+    $("#incRadiator").click(() => {
+        setRadiator($("#set_radiator").val(), "incRadiator");
+    });
+    $("#decRadiator").click(() => {
+        setRadiator($("#set_radiator").val(), "decRadiator");
     });
 });
 

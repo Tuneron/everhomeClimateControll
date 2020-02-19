@@ -50,6 +50,8 @@ public class RautControllerDriver {
     private SetClimateModeRepo setClimateModeRepo;
     @Autowired
     private SetSeasonRepo setSeasonRepo;
+    @Autowired
+    private SetRadiatorRepo setRadiatorRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -177,6 +179,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/set_season", setSeasonDto);
             SetSeason prevSetSeason = setSeasonRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SEASON);
             setSeasonRepo.save(setSeason);
+
+            float setRadiatorVal = (float) regs[11];
+            SetRadiator setRadiator = new SetRadiator(Parameter.SET_RADIATOR, now, setRadiatorVal);
+            SetRadiatorDto setRadiatorDto = new SetRadiatorDto(setRadiator);
+            template.convertAndSend("/topic/set_radiator", setRadiatorDto);
+            SetRadiator prevSetRadiator = setRadiatorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_RADIATOR);
+            setRadiatorRepo.save(setRadiator);
 
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, false);
@@ -386,5 +395,27 @@ public class RautControllerDriver {
         SetSeason setSeason = new SetSeason(Parameter.SET_SEASON, setSeasonDto.getTime(), setSeasonDto.getValue());
         setSeasonRepo.save(setSeason);
         return setSeasonDto;
+    }
+
+    @MessageMapping("/setRadiator/incRadiator")
+    @SendTo("/topic/set_radiator")
+    public SetRadiatorDto incSetRadiator(SetRadiatorDto setRadiatorDto) throws Exception{
+        setRadiatorDto.setTime(LocalDateTime.now());
+        setRadiatorDto.setValue(SetRadiator.inBorder(setRadiatorDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 11, (int) setRadiatorDto.getValue().floatValue());
+        SetRadiator setRadiator = new SetRadiator(Parameter.SET_RADIATOR, setRadiatorDto.getTime() ,setRadiatorDto.getValue());
+        setRadiatorRepo.save(setRadiator);
+        return setRadiatorDto;
+    }
+
+    @MessageMapping("/setRadiator/decRadiator")
+    @SendTo("/topic/set_radiator")
+    public SetRadiatorDto decSetRadiator(SetRadiatorDto setRadiatorDto) throws Exception{
+        setRadiatorDto.setTime(LocalDateTime.now());
+        setRadiatorDto.setValue(SetRadiator.inBorder(setRadiatorDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 11, (int) setRadiatorDto.getValue().floatValue());
+        SetRadiator setRadiator = new SetRadiator(Parameter.SET_RADIATOR, setRadiatorDto.getTime() ,setRadiatorDto.getValue());
+        setRadiatorRepo.save(setRadiator);
+        return setRadiatorDto;
     }
 }
