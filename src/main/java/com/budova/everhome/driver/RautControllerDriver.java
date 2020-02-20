@@ -52,8 +52,6 @@ public class RautControllerDriver {
     private SetSeasonRepo setSeasonRepo;
     @Autowired
     private SetRadiatorRepo setRadiatorRepo;
-    @Autowired
-    private SetHumidifierRepo setHumidifierRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -188,13 +186,6 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/set_radiator", setRadiatorDto);
             SetRadiator prevSetRadiator = setRadiatorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_RADIATOR);
             setRadiatorRepo.save(setRadiator);
-
-            float setHumidifierVal = (float) regs[12];
-            SetHumidifier setHumidifier = new SetHumidifier(Parameter.SET_HUMIDIFIER, now, setHumidifierVal);
-            SetHumidifierDto setHumidifierDto = new SetHumidifierDto(setHumidifier);
-            template.convertAndSend("/topic/setHumidifier", setHumidifierDto);
-            SetHumidifier prevSetHumidifier = setHumidifierRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_HUMIDIFIER);
-            setHumidifierRepo.save(setHumidifier);
 
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, false);
@@ -426,27 +417,5 @@ public class RautControllerDriver {
         SetRadiator setRadiator = new SetRadiator(Parameter.SET_RADIATOR, setRadiatorDto.getTime() ,setRadiatorDto.getValue());
         setRadiatorRepo.save(setRadiator);
         return setRadiatorDto;
-    }
-
-    @MessageMapping("/setHumidifier/incHumidifier")
-    @SendTo("/topic/set_humidifier")
-    public SetHumidifierDto incSetHumidifier (SetHumidifierDto setHumidifierDto) throws Exception{
-        setHumidifierDto.setTime(LocalDateTime.now());
-        setHumidifierDto.setValue(SetHumidifier.inBorder(setHumidifierDto.getValue().floatValue() + 1F));
-        master.writeSingleRegister(1, 12, (int) setHumidifierDto.getValue().floatValue());
-        SetHumidifier setHumidifier = new SetHumidifier(Parameter.SET_HUMIDIFIER, setHumidifierDto.getTime(), setHumidifierDto.getValue());
-        setHumidifierRepo.save(setHumidifier);
-        return  setHumidifierDto;
-    }
-
-    @MessageMapping("/setHumidifier/decHumidifier")
-    @SendTo("/topic/set_humidifier")
-    public SetHumidifierDto decSetHumidifier (SetHumidifierDto setHumidifierDto) throws Exception{
-        setHumidifierDto.setTime(LocalDateTime.now());
-        setHumidifierDto.setValue(SetHumidifier.inBorder(setHumidifierDto.getValue().floatValue() - 1F));
-        master.writeSingleRegister(1, 12, (int) setHumidifierDto.getValue().floatValue());
-        SetHumidifier setHumidifier = new SetHumidifier(Parameter.SET_HUMIDIFIER, setHumidifierDto.getTime(), setHumidifierDto.getValue());
-        setHumidifierRepo.save(setHumidifier);
-        return  setHumidifierDto;
     }
 }
