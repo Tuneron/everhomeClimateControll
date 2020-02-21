@@ -18,136 +18,296 @@
     </h2>
 </noscript>
 
-<p>Humidity</p>
-<p id="humidity">{{humidity}}</p>
-
-<p>Temperature</p>
-<p id="temperature">{{temperature}}</p>
-
-<table>
-    <tr>
-        <td>
-            <div class="setBlock">
-                <p>Set power</p>
-                <div class="row">
-                    <p id="set_power">{{set_power}}</p>
-                    <button id="onPower">ON</button>
-                    <button id="offPower">OFF</button>
-                </div>
+<table width="100%">
+    <tbody>
+    <tr valign="top">
+        <td rowspan="3" valign="center"><div class="setBlock">
+            <p><a href="/home">Reload page</a></p>
+            <p><a href="/api/temperature/day">Api for temperature</a></p>
+            <p><a href="/api/humidity/day">Api for humidity</a></p>
+            <p><a href="/api/command/day">Api for commands</a></p>
+        </div></td>
+        <td rowspan="7"><div class="setBlockChart">
+            <div class="row">
+                <div id="chartH" style="width: 1024px; height: 500px"></div>
             </div>
-        </td>
-        <td>
-            <div class="setBlock">
-                <p>Set temperature</p>
-                <div class="row">
-                    <p id="set_temperature">{{set_temperature}}</p>
-                    <button id="inc">+</button>
-                    <button id="dec">-</button>
-                </div>
+        </div></td>
+        <td>            <div class="setBlock">
+            <p>Set power</p>
+            <div class="row">
+                <p id="set_power">{{set_power}}</p>
+                <button id="onPower">ON</button>
+                <button id="offPower">OFF</button>
             </div>
-        </td>
-        <td>
-            <div class="setBlock">
-                <p>Set cond-er mode</p>
-                <div class="row">
-                    <p id="set_conditioner_mode">{{set_conditioner_mode}}</p>
-                    <button id="incConditionerMode">+</button>
-                    <button id="decConditionerMode">-</button>
-                </div>
+        </div></td>
+        <td>            <div class="setBlock">
+            <p>Set setting</p>
+            <div class="row">
+                <p id="set_setting">{{set_setting}}</p>
+                <button id="incSetting">+</button>
+                <button id="decSetting">-</button>
             </div>
-        </td>
-        <td>
-            <div class="setBlock">
-                <p>Set fan speed</p>
-                <div class="row">
-                    <p id="set_fan_speed">{{set_fan_speed}}</p>
-                    <button id="incFanSpeed">+</button>
-                    <button id="decFanSpeed">-</button>
-                </div>
+        </div></td>
+    </tr>
+    <tr valign="top">
+        <td>            <div class="setBlock">
+            <p>Set temperature</p>
+            <div class="row">
+                <p id="set_temperature">{{set_temperature}}</p>
+                <button id="inc">+</button>
+                <button id="dec">-</button>
             </div>
-        </td>
-        <td>
-            <div class="setBlock">
-                <p>Set fluger</p>
-                <div class="row">
-                    <p id="set_fluger">{{set_fluger}}</p>
-                    <button id="incFluger">+</button>
-                    <button id="decFluger">-</button>
-                </div>
+        </div></td>
+        <td>            <div class="setBlock">
+            <p>Set climate mode</p>
+            <div class="row">
+                <p id="set_climate_mode">{{set_climate_mode}}</p>
+                <button id="incClimateMode">+</button>
+                <button id="decClimateMode">-</button>
             </div>
-        </td>
-        <td>
-            <div class="setBlock">
-                <p>Set custom</p>
-                <div class="row">
-                    <p id="set_custom">{{set_custom}}</p>
-                    <button id="incCustom">+</button>
-                    <button id="decCustom">-</button>
-                </div>
-            </div>
-        </td>
+        </div></td>
     </tr>
     <tr>
-        <td>
-            <div class="setBlock">
-                <p>Set setting</p>
-                <div class="row">
-                    <p id="set_setting">{{set_setting}}</p>
-                    <button id="incSetting">+</button>
-                    <button id="decSetting">-</button>
-                </div>
+        <td>            <div class="setBlock">
+            <p>Set cond-er mode</p>
+            <div class="row">
+                <p id="set_conditioner_mode">{{set_conditioner_mode}}</p>
+                <button id="incConditionerMode">+</button>
+                <button id="decConditionerMode">-</button>
             </div>
-        </td>
-        <td>
-            <div class="setBlock">
-                <p>Set climate mode</p>
-                <div class="row">
-                    <p id="set_climate_mode">{{set_climate_mode}}</p>
-                    <button id="incClimateMode">+</button>
-                    <button id="decClimateMode">-</button>
-                </div>
+        </div></td>
+        <td>            <div class="setBlock">
+            <p>Set season</p>
+            <div class="row">
+                <p id="set_season">{{set_season}}</p>
+                <button id="incSeason">+</button>
+                <button id="decSeason">-</button>
             </div>
-        </td>
-        <td>
-            <div class="setBlock">
-                <p>Set season</p>
-                <div class="row">
-                    <p id="set_season">{{set_season}}</p>
-                    <button id="incSeason">+</button>
-                    <button id="decSeason">-</button>
-                </div>
-            </div>
-        </td>
-        <td>
-            <div class="setBlock">
-                <p>Set radiator</p>
-                <div class="row">
-                    <p id="set_radiator">{{set_radiator}}</p>
-                    <button id="incRadiator">+</button>
-                    <button id="decRadiator">-</button>
-                </div>
-            </div>
-        </td>
-        <td>
-            <div class="setBlock">
-                <p>Set humidifier</p>
-                <div class="row">
-                    <p id="set_humidifier">{{set_humidifier}}</p>
-                    <button id="incHumidifier">+</button>
-                    <button id="decHumidifier">-</button>
-                </div>
-            </div>
-        </td>
+        </div></td>
     </tr>
+    <tr>
+        <td rowspan="3"><div class="setBlock">
+            <p>Humidity</p>
+            <p id="humidity">{{humidity}}</p>
+
+            <p>Temperature</p>
+            <p id="temperature">{{temperature}}</p>
+        </div></td>
+        <td>            <div class="setBlock">
+            <p>Set fan speed</p>
+            <div class="row">
+                <p id="set_fan_speed">{{set_fan_speed}}</p>
+                <button id="incFanSpeed">+</button>
+                <button id="decFanSpeed">-</button>
+            </div>
+        </div></td>
+        <td>            <div class="setBlock">
+            <p>Set radiator</p>
+            <div class="row">
+                <p id="set_radiator">{{set_radiator}}</p>
+                <button id="incRadiator">+</button>
+                <button id="decRadiator">-</button>
+            </div>
+        </div></td>
+    </tr>
+    <tr>
+        <td>            <div class="setBlock">
+            <p>Set fluger</p>
+            <div class="row">
+                <p id="set_fluger">{{set_fluger}}</p>
+                <button id="incFluger">+</button>
+                <button id="decFluger">-</button>
+            </div>
+        </div></td>
+        <td>            <div class="setBlock">
+            <p>Set humidifier</p>
+            <div class="row">
+                <p id="set_humidifier">{{set_humidifier}}</p>
+                <button id="incHumidifier">+</button>
+                <button id="decHumidifier">-</button>
+            </div>
+        </div></td>
+    </tr>
+    <tr>
+        <td>            <div class="setBlock">
+            <p>Set custom</p>
+            <div class="row">
+                <p id="set_custom">{{set_custom}}</p>
+                <button id="incCustom">+</button>
+                <button id="decCustom">-</button>
+            </div>
+        </div></td>
+        <td>            <div class="setBlock">
+            <p>Send command</p>
+            <div class="row">
+                <p id="set_command">{{set_command}}</p>
+                <button id="sendCommand">Send</button>
+            </div>
+        </div></td>
+    </tr>
+    <tr>
+        <td><div class="setBlock">
+            <p>Connection raut:</p>
+            <p id="connection">{{connection}}</p>
+        </div></td>
+        <td><div class="setBlock"><p>H2</p></div></td>
+        <td><div class="setBlock"><p>H3</p></div></td>
+    </tr>
+    </tbody>
 </table>
 
-<p>Connection with raut : </p>
-<p id="connection">{{connection}}</p>
+<!--<div class="setBlock">-->
+<!--    <p><a href="/home">Reload page</a></p>-->
+<!--    <p><a href="/api/temperature/day">Api for temperature</a></p>-->
+<!--    <p><a href="/api/humidity/day">Api for humidity</a></p>-->
+<!--    <p><a href="/api/command/day">Api for commands</a></p>-->
+<!--</div>-->
 
-<div class="row">
-<div id="chartT" style="width: 900px; height: 500px"></div>
-<div id="chartH" style="width: 900px; height: 500px"></div>
-</div>
+<!--<div class="setBlock">-->
+<!--<p>Humidity</p>-->
+<!--<p id="humidity">{{humidity}}</p>-->
+
+<!--<p>Temperature</p>-->
+<!--<p id="temperature">{{temperature}}</p>-->
+<!--</div>-->
+
+<!--<table>-->
+<!--    <tr>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set power</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_power">{{set_power}}</p>-->
+<!--                    <button id="onPower">ON</button>-->
+<!--                    <button id="offPower">OFF</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set temperature</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_temperature">{{set_temperature}}</p>-->
+<!--                    <button id="inc">+</button>-->
+<!--                    <button id="dec">-</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set cond-er mode</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_conditioner_mode">{{set_conditioner_mode}}</p>-->
+<!--                    <button id="incConditionerMode">+</button>-->
+<!--                    <button id="decConditionerMode">-</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set fan speed</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_fan_speed">{{set_fan_speed}}</p>-->
+<!--                    <button id="incFanSpeed">+</button>-->
+<!--                    <button id="decFanSpeed">-</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set fluger</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_fluger">{{set_fluger}}</p>-->
+<!--                    <button id="incFluger">+</button>-->
+<!--                    <button id="decFluger">-</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set custom</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_custom">{{set_custom}}</p>-->
+<!--                    <button id="incCustom">+</button>-->
+<!--                    <button id="decCustom">-</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set setting</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_setting">{{set_setting}}</p>-->
+<!--                    <button id="incSetting">+</button>-->
+<!--                    <button id="decSetting">-</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set climate mode</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_climate_mode">{{set_climate_mode}}</p>-->
+<!--                    <button id="incClimateMode">+</button>-->
+<!--                    <button id="decClimateMode">-</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set season</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_season">{{set_season}}</p>-->
+<!--                    <button id="incSeason">+</button>-->
+<!--                    <button id="decSeason">-</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set radiator</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_radiator">{{set_radiator}}</p>-->
+<!--                    <button id="incRadiator">+</button>-->
+<!--                    <button id="decRadiator">-</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Set humidifier</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_humidifier">{{set_humidifier}}</p>-->
+<!--                    <button id="incHumidifier">+</button>-->
+<!--                    <button id="decHumidifier">-</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <div class="setBlock">-->
+<!--                <p>Send command</p>-->
+<!--                <div class="row">-->
+<!--                    <p id="set_command">{{set_command}}</p>-->
+<!--                    <button id="sendCommand">Send</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--    </tr>-->
+<!--</table>-->
+
+<!--<div class="setBlock">-->
+<!--<p>Connection with raut : </p>-->
+<!--<p id="connection">{{connection}}</p>-->
+<!--</div>-->
+
+<!--<div class="setBlockChart">-->
+<!--<div class="row">-->
+<!--<div id="chartT" style="width: 900px; height: 500px"></div>-->
+<!--<div id="chartH" style="width: 900px; height: 500px"></div>-->
+<!--</div>-->
+<!--</div>-->
 
 <p id="temperature3">{{temperature3}}</p>
 </body>

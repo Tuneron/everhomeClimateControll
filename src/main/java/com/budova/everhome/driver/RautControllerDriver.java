@@ -54,6 +54,8 @@ public class RautControllerDriver {
     private SetRadiatorRepo setRadiatorRepo;
     @Autowired
     private SetHumidifierRepo setHumidifierRepo;
+    @Autowired
+    private SetCommandRepo setCommandRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -62,6 +64,8 @@ public class RautControllerDriver {
 
     private final TcpParameters tcpParameters;
     private final ModbusMaster master;
+    private boolean buttonFlag = false;
+    private Integer[] checkRegs = new Integer[13];
 
     private RautControllerDriver() {
         tcpParameters = new TcpParameters();
@@ -75,6 +79,14 @@ public class RautControllerDriver {
         Modbus.setAutoIncrementTransactionId(true);
         master = ModbusMasterFactory.createModbusMasterTCP(tcpParameters);
         master.setResponseTimeout(1000);
+    }
+
+    private boolean changes(int[] first, Integer[] second){
+        for(int i =2; i < first.length; i++){
+            if(first[i] != second[i])
+                return true;
+        }
+        return false;
     }
 
     @Scheduled(fixedDelay = 1000L)
@@ -94,6 +106,10 @@ public class RautControllerDriver {
             Connection prevC = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
             if (prevC == null || Connection.isModuled(prevC, c)) {
                 connectionRepo.save(c);
+            }
+
+            for (int i = 2; i < 13; i++){
+                checkRegs[i] = regs[i];
             }
 
             float t1Val = (float) regs[0] / 10;
@@ -195,6 +211,29 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/setHumidifier", setHumidifierDto);
             SetHumidifier prevSetHumidifier = setHumidifierRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_HUMIDIFIER);
             setHumidifierRepo.save(setHumidifier);
+
+            float setCommandVal = (float) regs[2];
+            SetCommand setCommand = new SetCommand(Parameter.SET_COMMAND, now, setCommandVal);
+            setCommand.setCurrentHumidity((float) regs[0]);
+            setCommand.setCurrentTemperature((float) regs[1]);
+            setCommand.setConditionerPower(regs[2]);
+            setCommand.setConditionerTemperature(regs[3]);
+            setCommand.setConditionerMode(regs[4]);
+            setCommand.setConditionerFanSpeed(regs[5]);
+            setCommand.setConditionerFluger(regs[6]);
+            setCommand.setConditionerCustom(regs[7]);
+            setCommand.setConditionerSetting(regs[8]);
+            setCommand.setClimateMode(regs[9]);
+            setCommand.setClimateSeason(regs[10]);
+            setCommand.setRadiator(regs[11]);
+            setCommand.setHumidifier(regs[12]);
+            SetCommandDto setCommandDto = new SetCommandDto(setCommand);
+            template.convertAndSend("/topic/set_command", setCommandDto);
+            SetCommand prevSetCommand = setCommandRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_COMMAND);
+            if(prevSetCommand == null || changes(regs, prevSetCommand.getRegisters()) || buttonFlag){
+                setCommandRepo.save(setCommand);
+                buttonFlag = false;
+            }
 
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, false);
@@ -448,5 +487,17 @@ public class RautControllerDriver {
         SetHumidifier setHumidifier = new SetHumidifier(Parameter.SET_HUMIDIFIER, setHumidifierDto.getTime(), setHumidifierDto.getValue());
         setHumidifierRepo.save(setHumidifier);
         return  setHumidifierDto;
+    }
+
+    @MessageMapping("/setCommand/sendCommand")
+    @SendTo("/topic/set_command")
+    public SetCommandDto sendSetCommand (SetCommandDto setCommandDto) throws Exception{
+        setCommandDto.setTime(LocalDateTime.now());
+        setCommandDto.setValue(setCommandDto.getValue().floatValue());
+        master.writeSingleRegister(1, 2, (int) setCommandDto.getValue().floatValue());
+        SetCommand setCommand = new SetCommand(Parameter.SET_COMMAND, setCommandDto.getTime(), setCommandDto.getValue());
+        //setCommandRepo.save(setCommand);
+        buttonFlag = true;
+        return setCommandDto;
     }
 }

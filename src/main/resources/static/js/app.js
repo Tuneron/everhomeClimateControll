@@ -74,6 +74,11 @@ function connect() {
              updateSetHumidifier(setHumidifier.value);
         });
 
+        stompClient.subscribe('/topic/set_command', setCom => {
+             var setCommand = JSON.parse(setCom.body);
+             updateSetCommand(setCommand);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -119,6 +124,16 @@ function updateSetRadiator(value){
 }
 function updateSetHumidifier(value){
     $("#set_humidifier").text(value);
+}
+function updateSetCommand(cmd){
+    console.log("ETOT CMD ->>>"+cmd);
+    console.log("1 ->>>"+cmd.value);
+    console.log("2 ->>>"+cmd.currentTemperature);
+    $("#set_command").text(cmd.value);
+    $("#set_command").text(cmd.currentTemperature);
+    $("#set_command").text(cmd.currentHumidity);
+    $("#set_command").text(cmd.conditionerPower);
+
 }
 function updateConnection(value) {
     $("#connection").text(value);
@@ -234,6 +249,16 @@ function setHumidifier(value, dir){
     );
 }
 
+function setCommand(value, dir){
+    stompClient.send("/app/setCommand/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_command").text())
+            }
+        )
+    );
+}
+
 
 $(function () {
     $(document).ready(() => {
@@ -304,6 +329,9 @@ $(function () {
     });
     $("#decHumidifier").click(() => {
         setHumidifier($("#set_humidifier").val(), "decHumidifier");
+    });
+    $("#sendCommand").click(() => {
+        setCommand($("#set_command").val(), "sendCommand");
     });
 });
 

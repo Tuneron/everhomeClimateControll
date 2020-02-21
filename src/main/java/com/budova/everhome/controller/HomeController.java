@@ -41,6 +41,8 @@ public class HomeController {
     @Autowired
     private SetHumidifierRepo setHumidifierRepo;
     @Autowired
+    private SetCommandRepo setCommandRepo;
+    @Autowired
     private ConnectionRepo connectionRepo;
 
     @GetMapping("/home")
@@ -58,6 +60,7 @@ public class HomeController {
         SetSeason setSeason = setSeasonRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SEASON);
         SetRadiator setRadiator = setRadiatorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_RADIATOR);
         SetHumidifier setHumidifier = setHumidifierRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_HUMIDIFIER);
+        SetCommand setCommand = setCommandRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_COMMAND);
         Connection c = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
         model.addAttribute("humidity", h != null ? h.getValue() : "null");
         model.addAttribute("temperature", t1 != null ? t1.getValue() : "null");
@@ -72,6 +75,7 @@ public class HomeController {
         model.addAttribute("set_season", setSeason != null ? setSeason.getValue() : "null");
         model.addAttribute("set_radiator", setRadiator != null ? setRadiator.getValue() : "null");
         model.addAttribute("set_humidifier", setHumidifier != null ? setHumidifier.getValue() : "null");
+        model.addAttribute("set_command", setCommand != null ? setCommand.getValue() : "null");
         model.addAttribute("connection", c != null ? c.getValue() : "null");
         List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE);
         StringBuilder sb = new StringBuilder();
