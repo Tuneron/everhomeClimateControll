@@ -122,6 +122,7 @@ function updateSetSeason(value){
 function updateSetRadiator(value){
     $("#set_radiator").text(value);
 }
+<<<<<<< HEAD
 function updateSetHumidifier(value){
     $("#set_humidifier").text(value);
 }
@@ -239,6 +240,7 @@ function setRadiator(value, dir){
     );
 }
 
+<<<<<<< HEAD
 function setHumidifier(value, dir){
     stompClient.send("/app/setHumidifier/" + dir, {},
         JSON.stringify(
@@ -258,7 +260,6 @@ function setCommand(value, dir){
         )
     );
 }
-
 
 $(function () {
     $(document).ready(() => {
