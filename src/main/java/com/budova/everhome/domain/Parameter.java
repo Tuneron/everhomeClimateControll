@@ -20,7 +20,8 @@ public enum Parameter {
     SET_SEASON(12),
     SET_RADIATOR(13),
     SET_HUMIDIFIER(14),
-    SET_COMMAND(15);
+    SET_COMMAND(15),
+    DATE_POINT(16);
 
     private Integer id;
     private String name;

@@ -10,6 +10,8 @@ import com.intelligt.modbus.jlibmodbus.exception.ModbusProtocolException;
 import com.intelligt.modbus.jlibmodbus.master.ModbusMaster;
 import com.intelligt.modbus.jlibmodbus.master.ModbusMasterFactory;
 import com.intelligt.modbus.jlibmodbus.tcp.TcpParameters;
+import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Controller;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 @Controller
 @EnableScheduling
@@ -56,6 +60,8 @@ public class RautControllerDriver {
     private SetHumidifierRepo setHumidifierRepo;
     @Autowired
     private SetCommandRepo setCommandRepo;
+    @Autowired
+    private DatePointRepo datePointRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -233,6 +239,31 @@ public class RautControllerDriver {
             if(prevSetCommand == null || changes(regs, prevSetCommand.getRegisters()) || buttonFlag){
                 setCommandRepo.save(setCommand);
                 buttonFlag = false;
+            }
+
+//            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
+//            datePoint.setConditionerPower(1);
+//            datePoint.setConditionerTemperature(20);
+//
+//           DatePoint prevDataPoint = datePointRepo.findFirstByParamIsOrderByTimeDesc(Parameter.DATE_POINT);
+//            if (prevDataPoint == null) {
+//                datePointRepo.save(datePoint);
+//            }
+
+            LinkedList<DatePoint> datePoints = datePointRepo.findAllByParam(Parameter.DATE_POINT);
+            LinkedList<Long> deleteList = new LinkedList<Long>();
+
+            if(datePoints != null){
+                for (DatePoint d: datePoints) {
+                    if(LocalDateTime.now().isAfter(d.getDate())) {
+                        master.writeMultipleRegisters(1, 2, ArrayUtils.toPrimitive(d.getRegisters()));
+                        deleteList.add(d.getId());
+                    }
+                }
+
+                for (Long del: deleteList) {
+                    datePointRepo.deleteById(del);
+                }
             }
 
         } catch (ModbusProtocolException | ModbusNumberException | ModbusIOException e) {
@@ -498,6 +529,7 @@ public class RautControllerDriver {
         SetCommand setCommand = new SetCommand(Parameter.SET_COMMAND, setCommandDto.getTime(), setCommandDto.getValue());
         //setCommandRepo.save(setCommand);
         buttonFlag = true;
+
         return setCommandDto;
     }
 

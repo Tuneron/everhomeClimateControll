@@ -40,7 +40,7 @@ public class SetClimateModeDto {
 
     @Override
     public String toString() {
-        return "SetClimateMode{" +
+        return "SetClimateModeDto{" +
                 "time=" + time +
                 ", value=" + value +
                 '}';

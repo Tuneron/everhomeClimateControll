@@ -23,9 +23,11 @@
     <tr valign="top">
         <td rowspan="3" valign="center"><div class="setBlock">
             <p><a href="/home">Reload page</a></p>
+            <p><a href="/schedule">Schedule page</a></p>
             <p><a href="/api/temperature/day">Api for temperature</a></p>
             <p><a href="/api/humidity/day">Api for humidity</a></p>
             <p><a href="/api/command/day">Api for commands</a></p>
+            <p><a href="/api/datepoint/day">Api for date points</a></p>
         </div></td>
         <td rowspan="7"><div class="setBlockChart">
             <div class="row">
@@ -156,101 +158,101 @@
     </tbody>
 </table>
 
-<p>Humidity</p>
-<p id="humidity">{{humidity}}</p>
+<!--<p>Humidity</p>-->
+<!--<p id="humidity">{{humidity}}</p>-->
 
-<p>Temperature</p>
-<p id="temperature">{{temperature}}</p>
+<!--<p>Temperature</p>-->
+<!--<p id="temperature">{{temperature}}</p>-->
 
-<div class="setBlock">
-<p>Set power</p>
-<div class="row">
-    <p id="set_power">{{set_power}}</p>
-    <button id="onPower">ON</button>
-    <button id="offPower">OFF</button>
-</div>
-</div>
+<!--<div class="setBlock">-->
+<!--<p>Set power</p>-->
+<!--<div class="row">-->
+<!--    <p id="set_power">{{set_power}}</p>-->
+<!--    <button id="onPower">ON</button>-->
+<!--    <button id="offPower">OFF</button>-->
+<!--</div>-->
+<!--</div>-->
 
-<div class="setBlock">
-<p>Set temperature</p>
-<div class="row">
-    <p id="set_temperature">{{set_temperature}}</p>
-    <button id="inc">+</button>
-    <button id="dec">-</button>
-</div>
-</div>
+<!--<div class="setBlock">-->
+<!--<p>Set temperature</p>-->
+<!--<div class="row">-->
+<!--    <p id="set_temperature">{{set_temperature}}</p>-->
+<!--    <button id="inc">+</button>-->
+<!--    <button id="dec">-</button>-->
+<!--</div>-->
+<!--</div>-->
 
-<div class="setBlock">
-<p>Set conditioner mode</p>
-<div class="row">
-    <p id="set_conditioner_mode">{{set_conditioner_mode}}</p>
-    <button id="incConditionerMode">+</button>
-    <button id="decConditionerMode">-</button>
-</div>
-</div>
+<!--<div class="setBlock">-->
+<!--<p>Set conditioner mode</p>-->
+<!--<div class="row">-->
+<!--    <p id="set_conditioner_mode">{{set_conditioner_mode}}</p>-->
+<!--    <button id="incConditionerMode">+</button>-->
+<!--    <button id="decConditionerMode">-</button>-->
+<!--</div>-->
+<!--</div>-->
 
-<div class="setBlock">
-<p>Set fan speed</p>
-<div class="row">
-    <p id="set_fan_speed">{{set_fan_speed}}</p>
-    <button id="incFanSpeed">+</button>
-    <button id="decFanSpeed">-</button>
-</div>
-</div>
+<!--<div class="setBlock">-->
+<!--<p>Set fan speed</p>-->
+<!--<div class="row">-->
+<!--    <p id="set_fan_speed">{{set_fan_speed}}</p>-->
+<!--    <button id="incFanSpeed">+</button>-->
+<!--    <button id="decFanSpeed">-</button>-->
+<!--</div>-->
+<!--</div>-->
 
-<div class="setBlock">
-<p>Set fluger</p>
-<div class="row">
-    <p id="set_fluger">{{set_fluger}}</p>
-    <button id="incFluger">+</button>
-    <button id="decFluger">-</button>
-</div>
-</div>
+<!--<div class="setBlock">-->
+<!--<p>Set fluger</p>-->
+<!--<div class="row">-->
+<!--    <p id="set_fluger">{{set_fluger}}</p>-->
+<!--    <button id="incFluger">+</button>-->
+<!--    <button id="decFluger">-</button>-->
+<!--</div>-->
+<!--</div>-->
 
-<div class="setBlock">
-<p>Set custom</p>
-<div class="row">
-    <p id="set_custom">{{set_custom}}</p>
-    <button id="incCustom">+</button>
-    <button id="decCustom">-</button>
-</div>
-</div>
+<!--<div class="setBlock">-->
+<!--<p>Set custom</p>-->
+<!--<div class="row">-->
+<!--    <p id="set_custom">{{set_custom}}</p>-->
+<!--    <button id="incCustom">+</button>-->
+<!--    <button id="decCustom">-</button>-->
+<!--</div>-->
+<!--</div>-->
 
-<div class="setBlock">
-<p>Set setting</p>
-<div class="row">
-    <p id="set_setting">{{set_setting}}</p>
-    <button id="incSetting">+</button>
-    <button id="decSetting">-</button>
-</div>
-</div>
+<!--<div class="setBlock">-->
+<!--<p>Set setting</p>-->
+<!--<div class="row">-->
+<!--    <p id="set_setting">{{set_setting}}</p>-->
+<!--    <button id="incSetting">+</button>-->
+<!--    <button id="decSetting">-</button>-->
+<!--</div>-->
+<!--</div>-->
 
-<div class="setBlock">
-    <p>Set climate mode</p>
-    <div class="row">
-        <p id="set_climate_mode">{{set_climate_mode}}</p>
-        <button id="incClimateMode">+</button>
-        <button id="decClimateMode">-</button>
-    </div>
-</div>
+<!--<div class="setBlock">-->
+<!--    <p>Set climate mode</p>-->
+<!--    <div class="row">-->
+<!--        <p id="set_climate_mode">{{set_climate_mode}}</p>-->
+<!--        <button id="incClimateMode">+</button>-->
+<!--        <button id="decClimateMode">-</button>-->
+<!--    </div>-->
+<!--</div>-->
 
-<div class="setBlock">
-    <p>Set season</p>
-    <div class="row">
-        <p id="set_season">{{set_season}}</p>
-        <button id="incSeason">+</button>
-        <button id="decSeason">-</button>
-    </div>
-</div>
+<!--<div class="setBlock">-->
+<!--    <p>Set season</p>-->
+<!--    <div class="row">-->
+<!--        <p id="set_season">{{set_season}}</p>-->
+<!--        <button id="incSeason">+</button>-->
+<!--        <button id="decSeason">-</button>-->
+<!--    </div>-->
+<!--</div>-->
 
-<div class="setBlock">
-    <p>Set radiator</p>
-    <div class="row">
-        <p id="set_radiator">{{set_radiator}}</p>
-        <button id="incRadiator">+</button>
-        <button id="decRadiator">-</button>
-    </div>
-</div>
+<!--<div class="setBlock">-->
+<!--    <p>Set radiator</p>-->
+<!--    <div class="row">-->
+<!--        <p id="set_radiator">{{set_radiator}}</p>-->
+<!--        <button id="incRadiator">+</button>-->
+<!--        <button id="decRadiator">-</button>-->
+<!--    </div>-->
+<!--</div>-->
 
 <!--<div class="setBlock">-->
 <!--    <p><a href="/home">Reload page</a></p>-->

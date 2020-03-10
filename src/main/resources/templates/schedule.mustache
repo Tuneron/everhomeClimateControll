@@ -1,0 +1,121 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Schedule</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/js/app.js"></script>
+
+    <style>
+   table {
+    width: 500px; /* Ширина таблицы */
+    border: 1px solid green; /* Рамка вокруг таблицы */
+    margin: auto; /* Выравниваем таблицу по центру окна  */
+   }
+   td {
+    text-align: center; /* Выравниваем текст по центру ячейки */
+   }
+  </style>
+
+</head>
+
+<body>
+<noscript>
+    <h2 style="color: #ff0000">
+        Seems your browser doesn't support Javascript!
+        Websocket relies on Javascript being enabled.
+        Please enable Javascript and reload this page!
+    </h2>
+</noscript>
+
+<form action="/schedule" method="get">
+    <table>
+        <tr>
+            <td>
+                <p>Питание кондиционера</p>
+                <input name="getPower" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Заданная температура</p>
+                <input name="getTemp" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Режим работы кондиционера</p>
+                <input name="getMode" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Скорость вентилятора</p>
+                <input name="getFanSpeed" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Направление шторки</p>
+                <input name="getFluger" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Зарезервированный регистр </p>
+                <input name="getCustom" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Настройка режима работы раута</p>
+            <input name="getSetting" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Режим климат контроля</p>
+                <input name="getClimateMode" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Сезон</p>
+                <input name="getSeason" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Управление радиатором </p>
+                <input name="getRadiator" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Управление увлажнителем </p>
+                <input name="getHumidifier" type="number" width="300">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Дата и время </p>
+                <input name="getDate" type="date"/>
+                <input name="getTime" type="time"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            <input type="submit" value="Добавить запись"/>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<p id="count">{{count}}</p>
+
+<p>This is schedule</p>
+</body>
+</html>
