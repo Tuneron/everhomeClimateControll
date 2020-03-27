@@ -114,6 +114,27 @@
     </table>
 </form>
 
+<table>
+<tr>
+    <th> name </th>
+    <th> age </th>
+    <th> time </th>
+    <th> action </th>
+</tr>
+{{#arr}}
+    <tr>
+        <td>{{getName}}</td>
+        <td>{{getAge}}</td>
+        <td>{{getTime}}</td>
+        <td>
+            <form method="GET">
+                <input type="submit" name="action" value="del {{getName}}" />
+            </form>
+        </td>
+    </tr>
+{{/arr}}
+</table>
+
 <p id="count">{{count}}</p>
 
 <p>This is schedule</p>

@@ -1,5 +1,6 @@
 package com.budova.everhome.controller;
 
+import com.budova.everhome.conditioner.testClass;
 import com.budova.everhome.domain.DatePoint;
 import com.budova.everhome.domain.Parameter;
 import com.budova.everhome.driver.RautControllerDriver;
@@ -15,6 +16,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,28 +66,21 @@ public class ScheduleController {
             datePoint.setHumidifier(getHumidifier.intValue());
             datePointRepo.save(datePoint);
         }
+
+        testClass testClass1 = new testClass("Sasha", 20, LocalDateTime.now());
+        testClass testClass2 = new testClass("Kirill", 25, LocalDateTime.now());
+        testClass testClass3 = new testClass("Vova", 24, LocalDateTime.now());
+        testClass testClass4 = new testClass("Leha", 25, LocalDateTime.now());
+
+        ArrayList<testClass> testClasses = new ArrayList<testClass>();
+        testClasses.add(testClass1);
+        testClasses.add(testClass2);
+        testClasses.add(testClass3);
+        testClasses.add(testClass4);
+
+        model.addAttribute("arr", testClasses);
+
         return "schedule";
     }
-
-    @RequestMapping(value = "/schedule/change", method=RequestMethod.GET)
-    public String setCookie(HttpServletResponse response) {
-        // create a cookie
-        Cookie cookie = new Cookie("username", "Jovan");
-        //add cookie to response
-        response.addCookie(cookie);
-        return "change";
-
-    }
-
-    @RequestMapping(value = "/schedule/name", method=RequestMethod.GET)
-    public String readCookie(@CookieValue(value = "username", defaultValue = "Atta") String username, ModelMap model) {
-
-        model.addAttribute("user", "Hello " + username);
-        if(username == "Jovan")
-        return "name";
-        else
-            return "home";
-    }
-
 
 }
