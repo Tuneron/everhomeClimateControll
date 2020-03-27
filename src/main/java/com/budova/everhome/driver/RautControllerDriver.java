@@ -25,6 +25,7 @@ import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Set;
 
 @Controller
 @EnableScheduling
@@ -62,6 +63,8 @@ public class RautControllerDriver {
     private SetCommandRepo setCommandRepo;
     @Autowired
     private DatePointRepo datePointRepo;
+    @Autowired
+    private SetEcoRepo setEcoRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -88,7 +91,7 @@ public class RautControllerDriver {
     }
 
     private boolean changes(int[] first, Integer[] second){
-        for(int i =2; i < first.length; i++){
+        for(int i =2; i < 13; i++){
             if(first[i] != second[i])
                 return true;
         }
@@ -104,7 +107,7 @@ public class RautControllerDriver {
                 master.connect();
             }
 
-            int[] regs = master.readHoldingRegisters(1, 0, 13);
+            int[] regs = master.readHoldingRegisters(1, 0, 21);
 
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, true);
             ConnectionDto cDto = new ConnectionDto(c);
@@ -214,7 +217,7 @@ public class RautControllerDriver {
             float setHumidifierVal = (float) regs[12];
             SetHumidifier setHumidifier = new SetHumidifier(Parameter.SET_HUMIDIFIER, now, setHumidifierVal);
             SetHumidifierDto setHumidifierDto = new SetHumidifierDto(setHumidifier);
-            template.convertAndSend("/topic/setHumidifier", setHumidifierDto);
+            template.convertAndSend("/topic/set_humidifier", setHumidifierDto);
             SetHumidifier prevSetHumidifier = setHumidifierRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_HUMIDIFIER);
             setHumidifierRepo.save(setHumidifier);
 
@@ -240,6 +243,13 @@ public class RautControllerDriver {
                 setCommandRepo.save(setCommand);
                 buttonFlag = false;
             }
+
+            float setEcoVal = (float) regs[13];
+            SetEco setEco = new SetEco(Parameter.ECO, now, setEcoVal);
+            SetEcoDto setEcoDto = new SetEcoDto(setEco);
+            template.convertAndSend("/topic/setEco", setEcoDto);
+            SetEco prevSetEco = setEcoRepo.findFirstByParamIsOrderByTimeDesc(Parameter.ECO);
+            setEcoRepo.save(setEco);
 
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -531,6 +541,28 @@ public class RautControllerDriver {
         buttonFlag = true;
 
         return setCommandDto;
+    }
+
+    @MessageMapping("/setEco/incEco")
+    @SendTo("/topic/set_eco")
+    public SetEcoDto incSetEco (SetEcoDto setEcoDto) throws  Exception{
+        setEcoDto.setTime(LocalDateTime.now());
+        setEcoDto.setValue(SetEco.inBorder(setEcoDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1,13, (int) setEcoDto.getValue().floatValue());
+        SetEco setEco = new SetEco(Parameter.ECO, setEcoDto.getTime(), setEcoDto.getValue());
+        setEcoRepo.save(setEco);
+        return setEcoDto;
+    }
+
+    @MessageMapping("/setEco/decEco")
+    @SendTo("/topic/set_eco")
+    public SetEcoDto decSetEco (SetEcoDto setEcoDto) throws  Exception{
+        setEcoDto.setTime(LocalDateTime.now());
+        setEcoDto.setValue(SetEco.inBorder(setEcoDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1,13, (int) setEcoDto.getValue().floatValue());
+        SetEco setEco = new SetEco(Parameter.ECO, setEcoDto.getTime(), setEcoDto.getValue());
+        setEcoRepo.save(setEco);
+        return setEcoDto;
     }
 
 }

@@ -79,6 +79,11 @@ function connect() {
              updateSetCommand(setCommand);
         });
 
+        stompClient.subscribe('/topic/set_eco', setEc => {
+             var setEco= JSON.parse(setEc.body);
+             updateSetEco(setEco.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -125,6 +130,10 @@ function updateSetRadiator(value){
 function updateSetHumidifier(value){
     $("#set_humidifier").text(value);
 }
+function updateSetEco(value){
+    $("#set_eco").text(value);
+}
+
 function updateSetCommand(cmd){
     console.log("ETOT CMD ->>>"+cmd);
     console.log("1 ->>>"+cmd.value);
@@ -259,6 +268,16 @@ function setCommand(value, dir){
     );
 }
 
+function setEco(value, dir){
+    stompClient.send("/app/setEco/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_eco").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -331,6 +350,12 @@ $(function () {
     });
     $("#sendCommand").click(() => {
         setCommand($("#set_command").val(), "sendCommand");
+    });
+    $("#incEco").click(() => {
+        setEco($("#set_eco").val(), "incEco");
+    });
+    $("#decEco").click(() => {
+        setEco($("#set_eco").val(), "decEco");
     });
 });
 

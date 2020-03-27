@@ -11,6 +11,9 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,8 +64,28 @@ public class ScheduleController {
             datePoint.setHumidifier(getHumidifier.intValue());
             datePointRepo.save(datePoint);
         }
-
         return "schedule";
     }
+
+    @RequestMapping(value = "/schedule/change", method=RequestMethod.GET)
+    public String setCookie(HttpServletResponse response) {
+        // create a cookie
+        Cookie cookie = new Cookie("username", "Jovan");
+        //add cookie to response
+        response.addCookie(cookie);
+        return "change";
+
+    }
+
+    @RequestMapping(value = "/schedule/name", method=RequestMethod.GET)
+    public String readCookie(@CookieValue(value = "username", defaultValue = "Atta") String username, ModelMap model) {
+
+        model.addAttribute("user", "Hello " + username);
+        if(username == "Jovan")
+        return "name";
+        else
+            return "home";
+    }
+
 
 }

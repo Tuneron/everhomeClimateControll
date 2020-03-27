@@ -44,6 +44,8 @@ public class HomeController {
     private SetCommandRepo setCommandRepo;
     @Autowired
     private ConnectionRepo connectionRepo;
+    @Autowired
+    private SetEcoRepo setEcoRepo;
 
     @GetMapping("/home")
     public String home(Model model) {
@@ -62,6 +64,7 @@ public class HomeController {
         SetHumidifier setHumidifier = setHumidifierRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_HUMIDIFIER);
         SetCommand setCommand = setCommandRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_COMMAND);
         Connection c = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
+        SetEco setEco = setEcoRepo.findFirstByParamIsOrderByTimeDesc(Parameter.ECO);
         model.addAttribute("humidity", h != null ? h.getValue() : "null");
         model.addAttribute("temperature", t1 != null ? t1.getValue() : "null");
         model.addAttribute("set_power", stP != null ? stP.getValue() : "null");
@@ -76,6 +79,7 @@ public class HomeController {
         model.addAttribute("set_radiator", setRadiator != null ? setRadiator.getValue() : "null");
         model.addAttribute("set_humidifier", setHumidifier != null ? setHumidifier.getValue() : "null");
         model.addAttribute("set_command", setCommand != null ? setCommand.getValue() : "null");
+        model.addAttribute("set_eco", setEco != null ? setEco.getValue() : "null");
         model.addAttribute("connection", c != null ? c.getValue() : "null");
         List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE);
         StringBuilder sb = new StringBuilder();
