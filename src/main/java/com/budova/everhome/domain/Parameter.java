@@ -22,7 +22,14 @@ public enum Parameter {
     SET_HUMIDIFIER(14),
     SET_COMMAND(15),
     DATE_POINT(16),
-    ECO(17);
+    ECO(17),
+    SET_WINDOW(18),
+    SET_RECUPERATOR(19),
+    SET_WATER_FLOOR(20),
+    SET_ELECTRIC_FLOOR(21),
+    SET_OUTSIDE_CONDITIONS(22),
+    SET_SILENCE(23),
+    SET_NIGHT(24);
 
     private Integer id;
     private String name;

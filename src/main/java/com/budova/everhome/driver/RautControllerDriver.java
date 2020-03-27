@@ -65,6 +65,8 @@ public class RautControllerDriver {
     private DatePointRepo datePointRepo;
     @Autowired
     private SetEcoRepo setEcoRepo;
+    @Autowired
+    private SetWindowRepo setWindowRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -250,6 +252,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/setEco", setEcoDto);
             SetEco prevSetEco = setEcoRepo.findFirstByParamIsOrderByTimeDesc(Parameter.ECO);
             setEcoRepo.save(setEco);
+
+            float setWindowVal = (float) regs[14];
+            SetWindow setWindow = new SetWindow(Parameter.SET_WINDOW, now, setWindowVal);
+            SetWindowDto setWindowDto = new SetWindowDto(setWindow);
+            template.convertAndSend("/topic/setWindow", setWindowDto);
+            SetWindow prevSetWindow = setWindowRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_WINDOW);
+            setWindowRepo.save(setWindow);
 
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -565,4 +574,25 @@ public class RautControllerDriver {
         return setEcoDto;
     }
 
+    @MessageMapping("/setWindow/incWindow")
+    @SendTo("/topic/set_window")
+    public SetWindowDto incSetWindow (SetWindowDto setWindowDto) throws  Exception{
+        setWindowDto.setTime(LocalDateTime.now());
+        setWindowDto.setValue(SetWindow.inBorder(setWindowDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1,14, (int) setWindowDto.getValue().floatValue());
+        SetWindow setWindow = new SetWindow(Parameter.SET_WINDOW, setWindowDto.getTime(), setWindowDto.getValue());
+        setWindowRepo.save(setWindow);
+        return setWindowDto;
+    }
+
+    @MessageMapping("/setWindow/decWindow")
+    @SendTo("/topic/set_window")
+    public SetWindowDto decSetWindow (SetWindowDto setWindowDto) throws  Exception{
+        setWindowDto.setTime(LocalDateTime.now());
+        setWindowDto.setValue(SetWindow.inBorder(setWindowDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1,14, (int) setWindowDto.getValue().floatValue());
+        SetWindow setWindow = new SetWindow(Parameter.SET_WINDOW, setWindowDto.getTime(), setWindowDto.getValue());
+        setWindowRepo.save(setWindow);
+        return setWindowDto;
+    }
 }
