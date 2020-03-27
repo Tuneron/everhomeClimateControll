@@ -67,6 +67,8 @@ public class RautControllerDriver {
     private SetEcoRepo setEcoRepo;
     @Autowired
     private SetWindowRepo setWindowRepo;
+    @Autowired
+    private SetRecuperatorRepo setRecuperatorRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -259,6 +261,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/setWindow", setWindowDto);
             SetWindow prevSetWindow = setWindowRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_WINDOW);
             setWindowRepo.save(setWindow);
+
+            float setRecuperatorVal = (float) regs[15];
+            SetRecuperator setRecuperator = new SetRecuperator(Parameter.SET_RECUPERATOR, now, setRecuperatorVal);
+            SetRecuperatorDto setRecuperatorDto = new SetRecuperatorDto(setRecuperator);
+            template.convertAndSend("/topic/setRecuperator", setRecuperator);
+            SetRecuperator prevSetRecuperator= setRecuperatorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_RECUPERATOR);
+            setRecuperatorRepo.save(setRecuperator);
 
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -594,5 +603,27 @@ public class RautControllerDriver {
         SetWindow setWindow = new SetWindow(Parameter.SET_WINDOW, setWindowDto.getTime(), setWindowDto.getValue());
         setWindowRepo.save(setWindow);
         return setWindowDto;
+    }
+
+    @MessageMapping("/setRecuperator//incRecuperator")
+    @SendTo("/topic/set_recuperator")
+    public SetRecuperatorDto incSetRecuperator (SetRecuperatorDto setRecuperatorDto) throws  Exception{
+        setRecuperatorDto.setTime(LocalDateTime.now());
+        setRecuperatorDto.setValue(SetRecuperator.inBorder(setRecuperatorDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1,15, (int) setRecuperatorDto.getValue().floatValue());
+        SetRecuperator setRecuperator = new SetRecuperator(Parameter.SET_RECUPERATOR, setRecuperatorDto.getTime(), setRecuperatorDto.getValue());
+        setRecuperatorRepo.save(setRecuperator);
+        return setRecuperatorDto;
+    }
+
+    @MessageMapping("/setRecuperator/decRecuperator")
+    @SendTo("/topic/set_recuperator")
+    public SetRecuperatorDto decSetRecuperator (SetRecuperatorDto setRecuperatorDto) throws  Exception{
+        setRecuperatorDto.setTime(LocalDateTime.now());
+        setRecuperatorDto.setValue(SetRecuperator.inBorder(setRecuperatorDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1,15, (int) setRecuperatorDto.getValue().floatValue());
+        SetRecuperator setRecuperator = new SetRecuperator(Parameter.SET_RECUPERATOR, setRecuperatorDto.getTime(), setRecuperatorDto.getValue());
+        setRecuperatorRepo.save(setRecuperator);
+        return setRecuperatorDto;
     }
 }

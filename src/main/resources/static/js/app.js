@@ -89,6 +89,11 @@ function connect() {
              updateSetWindow(setWindow.value);
         });
 
+        stompClient.subscribe('/topic/set_recuperator', setRec => {
+             var setRecuperator= JSON.parse(setRec.body);
+             updateSetRecuperator(setRecuperator.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -140,6 +145,9 @@ function updateSetEco(value){
 }
 function updateSetWindow(value){
     $("#set_window").text(value);
+}
+function updateSetRecuperator(value){
+    $("#set_recuperator").text(value);
 }
 
 function updateSetCommand(cmd){
@@ -296,6 +304,16 @@ function setWindow(value, dir){
     );
 }
 
+function setRecuperator(value, dir){
+    stompClient.send("/app/setRecuperator/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_recuperator").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -380,6 +398,12 @@ $(function () {
     });
     $("#decWindow").click(() => {
         setWindow($("#set_window").val(), "decWindow");
+    });
+    $("#incRecuperator").click(() => {
+        setRecuperator($("#set_recuperator").val(), "incRecuperator");
+    });
+    $("#decRecuperator").click(() => {
+        setRecuperator($("#set_recuperator").val(), "decRecuperator");
     });
 });
 
