@@ -104,6 +104,11 @@ function connect() {
              updateSetElectricFloor(setElectricFloor.value);
         });
 
+        stompClient.subscribe('/topic/set_outside_conditions', setOutCond => {
+             var setOutsideConditions= JSON.parse(setOutCond.body);
+             updateSetOutsideConditions(setOutsideConditions.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -164,6 +169,9 @@ function updateSetWaterFloor(value){
 }
 function updateSetElectricFloor(value){
     $("#set_electric_floor").text(value);
+}
+function updateSetOutsideConditions(value){
+    $("#set_outside_conditions").text(value);
 }
 
 function updateSetCommand(cmd){
@@ -350,6 +358,16 @@ function setElectricFloor(value, dir){
     );
 }
 
+function setOutsideConditions(value, dir){
+    stompClient.send("/app/setOutsideConditions/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_outside_conditions").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -452,6 +470,12 @@ $(function () {
     });
     $("#decElectricFloor").click(() => {
         setElectricFloor($("#set_electric_floor").val(), "decElectricFloor");
+    });
+    $("#incOutsideConditions").click(() => {
+        setOutsideConditions($("#set_outside_conditions").val(), "incOutsideConditions");
+    });
+    $("#decOutsideConditions").click(() => {
+        setOutsideConditions($("#set_outside_conditions").val(), "decOutsideConditions");
     });
 });
 

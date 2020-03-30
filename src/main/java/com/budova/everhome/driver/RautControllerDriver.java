@@ -73,6 +73,8 @@ public class RautControllerDriver {
     private SetWaterFloorRepo setWaterFloorRepo;
     @Autowired
     private SetElectricFloorRepo setElectricFloorRepo;
+    @Autowired
+    private SetOutsideConditionsRepo setOutsideConditionsRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -286,6 +288,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/setElectricFloor", setElectricFloorDto);
             SetElectricFloor prevSetElectricFloor = setElectricFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ELECTRIC_FLOOR);
             setElectricFloorRepo.save(setElectricFloor);
+
+            float setOutsideConditionsVal = (float) regs[18];
+            SetOutsideConditions setOutsideConditions = new SetOutsideConditions(Parameter.SET_OUTSIDE_CONDITIONS, now, setOutsideConditionsVal);
+            SetOutsideConditionsDto setOutsideConditionsDto = new SetOutsideConditionsDto(setOutsideConditions);
+            template.convertAndSend("/topic/setOutsideConditions", setOutsideConditionsDto);
+            SetOutsideConditions prevSetOutsideConditions = setOutsideConditionsRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_OUTSIDE_CONDITIONS);
+            setOutsideConditionsRepo.save(setOutsideConditions);
 
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -688,4 +697,27 @@ public class RautControllerDriver {
         setElectricFloorRepo.save(setElectricFloor);
         return setElectricFloorDto;
     }
+
+    @MessageMapping("/setOutsideConditions/incOutsideConditions")
+    @SendTo("/topic/set_outside_conditions")
+    public  SetOutsideConditionsDto incSetOutsideConditions(SetOutsideConditionsDto setOutsideConditionsDto) throws  Exception{
+        setOutsideConditionsDto.setTime(LocalDateTime.now());
+        setOutsideConditionsDto.setValue(SetOutsideConditions.inBorder(setOutsideConditionsDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 18, (int) setOutsideConditionsDto.getValue().floatValue());
+        SetOutsideConditions setOutsideConditions = new SetOutsideConditions(Parameter.SET_OUTSIDE_CONDITIONS, setOutsideConditionsDto.getTime(), setOutsideConditionsDto.getValue());
+        setOutsideConditionsRepo.save(setOutsideConditions);
+        return setOutsideConditionsDto;
+    }
+
+    @MessageMapping("/setOutsideConditions/decOutsideConditions")
+    @SendTo("/topic/set_outside_conditions")
+    public  SetOutsideConditionsDto decSetOutsideConditions(SetOutsideConditionsDto setOutsideConditionsDto) throws  Exception{
+        setOutsideConditionsDto.setTime(LocalDateTime.now());
+        setOutsideConditionsDto.setValue(SetOutsideConditions.inBorder(setOutsideConditionsDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 18, (int) setOutsideConditionsDto.getValue().floatValue());
+        SetOutsideConditions setOutsideConditions = new SetOutsideConditions(Parameter.SET_OUTSIDE_CONDITIONS, setOutsideConditionsDto.getTime(), setOutsideConditionsDto.getValue());
+        setOutsideConditionsRepo.save(setOutsideConditions);
+        return setOutsideConditionsDto;
+    }
+
 }
