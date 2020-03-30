@@ -94,6 +94,11 @@ function connect() {
              updateSetRecuperator(setRecuperator.value);
         });
 
+        stompClient.subscribe('/topic/set_water_floor', setWF => {
+             var setWaterFloor= JSON.parse(setWF.body);
+             updateSetWaterFloor(setWaterFloor.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -148,6 +153,9 @@ function updateSetWindow(value){
 }
 function updateSetRecuperator(value){
     $("#set_recuperator").text(value);
+}
+function updateSetWaterFloor(value){
+    $("#set_water_floor").text(value);
 }
 
 function updateSetCommand(cmd){
@@ -314,6 +322,16 @@ function setRecuperator(value, dir){
     );
 }
 
+function setWaterFloor(value, dir){
+    stompClient.send("/app/setWaterFloor/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_water_floor").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -404,6 +422,12 @@ $(function () {
     });
     $("#decRecuperator").click(() => {
         setRecuperator($("#set_recuperator").val(), "decRecuperator");
+    });
+    $("#incWaterFloor").click(() => {
+        setWaterFloor($("#set_water_floor").val(), "incWaterFloor");
+    });
+    $("#decWaterFloor").click(() => {
+        setWaterFloor($("#set_water_floor").val(), "decWaterFloor");
     });
 });
 

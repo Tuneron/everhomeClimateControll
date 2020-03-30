@@ -69,6 +69,8 @@ public class RautControllerDriver {
     private SetWindowRepo setWindowRepo;
     @Autowired
     private SetRecuperatorRepo setRecuperatorRepo;
+    @Autowired
+    private SetWaterFloorRepo setWaterFloorRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -265,9 +267,16 @@ public class RautControllerDriver {
             float setRecuperatorVal = (float) regs[15];
             SetRecuperator setRecuperator = new SetRecuperator(Parameter.SET_RECUPERATOR, now, setRecuperatorVal);
             SetRecuperatorDto setRecuperatorDto = new SetRecuperatorDto(setRecuperator);
-            template.convertAndSend("/topic/setRecuperator", setRecuperator);
+            template.convertAndSend("/topic/setRecuperator", setRecuperatorDto);
             SetRecuperator prevSetRecuperator= setRecuperatorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_RECUPERATOR);
             setRecuperatorRepo.save(setRecuperator);
+
+            float setWaterFloorVal = (float) regs[16];
+            SetWaterFloor setWaterFloor = new SetWaterFloor(Parameter.SET_WATER_FLOOR, now, setWaterFloorVal);
+            SetWaterFloorDto setWaterFloorDto = new SetWaterFloorDto(setWaterFloor);
+            template.convertAndSend("/topic/setWaterFloor", setWaterFloorDto);
+            SetWaterFloor prevSetWaterFloor = setWaterFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_WATER_FLOOR);
+            setWaterFloorRepo.save(setWaterFloor);
 
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -625,5 +634,27 @@ public class RautControllerDriver {
         SetRecuperator setRecuperator = new SetRecuperator(Parameter.SET_RECUPERATOR, setRecuperatorDto.getTime(), setRecuperatorDto.getValue());
         setRecuperatorRepo.save(setRecuperator);
         return setRecuperatorDto;
+    }
+
+    @MessageMapping("/setWaterFloor/incWaterFloor")
+    @SendTo("/topic/set_water_floor")
+    public SetWaterFloorDto incSetWaterFloor(SetWaterFloorDto setWaterFloorDto) throws Exception{
+        setWaterFloorDto.setTime(LocalDateTime.now());
+        setWaterFloorDto.setValue(SetWaterFloor.inBorder(setWaterFloorDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 16, (int) setWaterFloorDto.getValue().floatValue());
+        SetWaterFloor setWaterFloor = new SetWaterFloor(Parameter.SET_WATER_FLOOR, setWaterFloorDto.getTime(), setWaterFloorDto.getValue());
+        setWaterFloorRepo.save(setWaterFloor);
+        return setWaterFloorDto;
+    }
+
+    @MessageMapping("/setWaterFloor/decWaterFloor")
+    @SendTo("/topic/set_water_floor")
+    public SetWaterFloorDto decSetWaterFloor(SetWaterFloorDto setWaterFloorDto) throws Exception{
+        setWaterFloorDto.setTime(LocalDateTime.now());
+        setWaterFloorDto.setValue(SetWaterFloor.inBorder(setWaterFloorDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 16, (int) setWaterFloorDto.getValue().floatValue());
+        SetWaterFloor setWaterFloor = new SetWaterFloor(Parameter.SET_WATER_FLOOR, setWaterFloorDto.getTime(), setWaterFloorDto.getValue());
+        setWaterFloorRepo.save(setWaterFloor);
+        return setWaterFloorDto;
     }
 }
