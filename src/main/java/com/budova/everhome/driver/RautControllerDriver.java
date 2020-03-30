@@ -71,6 +71,8 @@ public class RautControllerDriver {
     private SetRecuperatorRepo setRecuperatorRepo;
     @Autowired
     private SetWaterFloorRepo setWaterFloorRepo;
+    @Autowired
+    private SetElectricFloorRepo setElectricFloorRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -277,6 +279,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/setWaterFloor", setWaterFloorDto);
             SetWaterFloor prevSetWaterFloor = setWaterFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_WATER_FLOOR);
             setWaterFloorRepo.save(setWaterFloor);
+
+            float setElectricFloorVal = (float) regs[17];
+            SetElectricFloor setElectricFloor = new SetElectricFloor(Parameter.SET_ELECTRIC_FLOOR, now, setElectricFloorVal);
+            SetElectricFloorDto setElectricFloorDto = new SetElectricFloorDto(setElectricFloor);
+            template.convertAndSend("/topic/setElectricFloor", setElectricFloorDto);
+            SetElectricFloor prevSetElectricFloor = setElectricFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ELECTRIC_FLOOR);
+            setElectricFloorRepo.save(setElectricFloor);
 
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -656,5 +665,27 @@ public class RautControllerDriver {
         SetWaterFloor setWaterFloor = new SetWaterFloor(Parameter.SET_WATER_FLOOR, setWaterFloorDto.getTime(), setWaterFloorDto.getValue());
         setWaterFloorRepo.save(setWaterFloor);
         return setWaterFloorDto;
+    }
+
+    @MessageMapping("/setElectricFloor/incElectricFloor")
+    @SendTo("/topic/set_electric_floor")
+    public SetElectricFloorDto incSetElectricFloor(SetElectricFloorDto setElectricFloorDto) throws Exception{
+        setElectricFloorDto.setTime(LocalDateTime.now());
+        setElectricFloorDto.setValue(SetElectricFloor.inBorder(setElectricFloorDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 17, (int) setElectricFloorDto.getValue().floatValue());
+        SetElectricFloor setElectricFloor = new SetElectricFloor(Parameter.SET_ELECTRIC_FLOOR, setElectricFloorDto.getTime(), setElectricFloorDto.getValue());
+        setElectricFloorRepo.save(setElectricFloor);
+        return setElectricFloorDto;
+    }
+
+    @MessageMapping("/setElectricFloor/decElectricFloor")
+    @SendTo("/topic/set_electric_floor")
+    public SetElectricFloorDto decSetElectricFloor(SetElectricFloorDto setElectricFloorDto) throws Exception{
+        setElectricFloorDto.setTime(LocalDateTime.now());
+        setElectricFloorDto.setValue(SetElectricFloor.inBorder(setElectricFloorDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 17, (int) setElectricFloorDto.getValue().floatValue());
+        SetElectricFloor setElectricFloor = new SetElectricFloor(Parameter.SET_ELECTRIC_FLOOR, setElectricFloorDto.getTime(), setElectricFloorDto.getValue());
+        setElectricFloorRepo.save(setElectricFloor);
+        return setElectricFloorDto;
     }
 }
