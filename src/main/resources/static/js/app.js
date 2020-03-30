@@ -109,6 +109,11 @@ function connect() {
              updateSetOutsideConditions(setOutsideConditions.value);
         });
 
+        stompClient.subscribe('/topic/set_silence', setSil => {
+             var setSilence= JSON.parse(setSil.body);
+             updateSetSilence(setSilence.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -172,6 +177,9 @@ function updateSetElectricFloor(value){
 }
 function updateSetOutsideConditions(value){
     $("#set_outside_conditions").text(value);
+}
+function updateSetSilence(value){
+    $("#set_silence").text(value);
 }
 
 function updateSetCommand(cmd){
@@ -368,6 +376,16 @@ function setOutsideConditions(value, dir){
     );
 }
 
+function setSilence(value, dir){
+    stompClient.send("/app/setSilence/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_silence").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -476,6 +494,12 @@ $(function () {
     });
     $("#decOutsideConditions").click(() => {
         setOutsideConditions($("#set_outside_conditions").val(), "decOutsideConditions");
+    });
+    $("#incSilence").click(() => {
+        setSilence($("#set_silence").val(), "incSilence");
+    });
+    $("#decSilence").click(() => {
+        setSilence($("#set_silence").val(), "decSilence");
     });
 });
 

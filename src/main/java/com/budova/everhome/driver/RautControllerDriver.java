@@ -75,6 +75,8 @@ public class RautControllerDriver {
     private SetElectricFloorRepo setElectricFloorRepo;
     @Autowired
     private SetOutsideConditionsRepo setOutsideConditionsRepo;
+    @Autowired
+    private SetSilenceRepo setSilenceRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -295,6 +297,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/setOutsideConditions", setOutsideConditionsDto);
             SetOutsideConditions prevSetOutsideConditions = setOutsideConditionsRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_OUTSIDE_CONDITIONS);
             setOutsideConditionsRepo.save(setOutsideConditions);
+
+            float setSilenceVal = (float) regs[19];
+            SetSilence setSilence = new SetSilence(Parameter.SET_SILENCE, now, setSilenceVal);
+            SetSilenceDto setSilenceDto = new SetSilenceDto(setSilence);
+            template.convertAndSend("/topic/setSilence", setSilenceDto);
+            SetSilence prevSetSilence = setSilenceRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SILENCE);
+            setSilenceRepo.save(setSilence);
 
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -718,6 +727,28 @@ public class RautControllerDriver {
         SetOutsideConditions setOutsideConditions = new SetOutsideConditions(Parameter.SET_OUTSIDE_CONDITIONS, setOutsideConditionsDto.getTime(), setOutsideConditionsDto.getValue());
         setOutsideConditionsRepo.save(setOutsideConditions);
         return setOutsideConditionsDto;
+    }
+
+    @MessageMapping("/setSilence/incSilence")
+    @SendTo("/topic/set_silence")
+    public SetSilenceDto incSetSilence (SetSilenceDto setSilenceDto) throws Exception{
+        setSilenceDto.setTime(LocalDateTime.now());
+        setSilenceDto.setValue(SetSilence.inBorder(setSilenceDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 19, (int) setSilenceDto.getValue().floatValue());
+        SetSilence setSilence = new SetSilence(Parameter.SET_SILENCE, setSilenceDto.getTime(), setSilenceDto.getValue());
+        setSilenceRepo.save(setSilence);
+        return setSilenceDto;
+    }
+
+    @MessageMapping("/setSilence/decSilence")
+    @SendTo("/topic/set_silence")
+    public SetSilenceDto decSetSilence (SetSilenceDto setSilenceDto) throws Exception{
+        setSilenceDto.setTime(LocalDateTime.now());
+        setSilenceDto.setValue(SetSilence.inBorder(setSilenceDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 19, (int) setSilenceDto.getValue().floatValue());
+        SetSilence setSilence = new SetSilence(Parameter.SET_SILENCE, setSilenceDto.getTime(), setSilenceDto.getValue());
+        setSilenceRepo.save(setSilence);
+        return setSilenceDto;
     }
 
 }

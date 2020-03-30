@@ -56,6 +56,8 @@ public class HomeController {
     private SetElectricFloorRepo setElectricFloorRepo;
     @Autowired
     private SetOutsideConditionsRepo setOutsideConditionsRepo;
+    @Autowired
+    private SetSilenceRepo setSilenceRepo;
 
     @GetMapping("/home")
     public String home(Model model) {
@@ -79,6 +81,7 @@ public class HomeController {
         SetWaterFloor setWaterFloor = setWaterFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_WATER_FLOOR);
         SetElectricFloor setElectricFloor = setElectricFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ELECTRIC_FLOOR);
         SetOutsideConditions setOutsideConditions = setOutsideConditionsRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_OUTSIDE_CONDITIONS);
+        SetSilence setSilence = setSilenceRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SILENCE);
         Connection c = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
         model.addAttribute("humidity", h != null ? h.getValue() : "null");
         model.addAttribute("temperature", t1 != null ? t1.getValue() : "null");
@@ -100,6 +103,7 @@ public class HomeController {
         model.addAttribute("set_water_floor", setWaterFloor != null ? setWaterFloor.getValue() : "null");
         model.addAttribute("set_electric_floor", setElectricFloor != null? setElectricFloor.getValue() : "null");
         model.addAttribute("set_outside_conditions", setOutsideConditions != null? setOutsideConditions.getValue() : "null");
+        model.addAttribute("set_silence", setSilence != null ? setSilence.getValue() : "null");
         model.addAttribute("connection", c != null ? c.getValue() : "null");
         List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE);
         StringBuilder sb = new StringBuilder();
