@@ -79,6 +79,8 @@ public class RautControllerDriver {
     private SetSilenceRepo setSilenceRepo;
     @Autowired
     private SetNightRepo setNightRepo;
+    @Autowired
+    private SetEnableEcoRadiatorRepo setEnableEcoRadiatorRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -313,6 +315,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/setNight", setNightDto);
             SetNight prevSetNight = setNightRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_NIGHT);
             setNightRepo.save(setNight);
+
+            float setEnableEcoRadiatorVal = (float) regs[21];
+            SetEnableEcoRadiator setEnableEcoRadiator = new SetEnableEcoRadiator(Parameter.SET_ENABLE_ECO_RADIATOR, now, setEnableEcoRadiatorVal);
+            SetEnableEcoRadiatorDto setEnableEcoRadiatorDto = new SetEnableEcoRadiatorDto(setEnableEcoRadiator);
+            template.convertAndSend("/topic/SetEnableEcoRadiator");
+            SetEnableEcoRadiator prevSetEnableEcoRadiator = setEnableEcoRadiatorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_RADIATOR);
+            setEnableEcoRadiatorRepo.save(setEnableEcoRadiator);
 
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -780,6 +789,28 @@ public class RautControllerDriver {
         SetNight setNight = new SetNight(Parameter.SET_NIGHT, setNightDto.getTime(), setNightDto.getValue());
         setNightRepo.save(setNight);
         return setNightDto;
+    }
+
+    @MessageMapping("/SetEnableEcoRadiator/incEnableEcoRadiator")
+    @SendTo("/topic/set_enable_eco_radiator")
+    public SetEnableEcoRadiatorDto incSetEnableEcoRadiator (SetEnableEcoRadiatorDto setEnableEcoRadiatorDto) throws Exception{
+        setEnableEcoRadiatorDto.setTime(LocalDateTime.now());
+        setEnableEcoRadiatorDto.setValue(SetEnableEcoRadiator.inBorder(setEnableEcoRadiatorDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 21, (int) setEnableEcoRadiatorDto.getValue().floatValue());
+        SetEnableEcoRadiator setEnableEcoRadiator = new SetEnableEcoRadiator(Parameter.SET_ENABLE_ECO_RADIATOR, setEnableEcoRadiatorDto.getTime(), setEnableEcoRadiatorDto.getValue());
+        setEnableEcoRadiatorRepo.save(setEnableEcoRadiator);
+        return setEnableEcoRadiatorDto;
+    }
+
+    @MessageMapping("/SetEnableEcoRadiator/decEnableEcoRadiator")
+    @SendTo("/topic/set_enable_eco_radiator")
+    public SetEnableEcoRadiatorDto decSetEnableEcoRadiator (SetEnableEcoRadiatorDto setEnableEcoRadiatorDto) throws Exception{
+        setEnableEcoRadiatorDto.setTime(LocalDateTime.now());
+        setEnableEcoRadiatorDto.setValue(SetEnableEcoRadiator.inBorder(setEnableEcoRadiatorDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 21, (int) setEnableEcoRadiatorDto.getValue().floatValue());
+        SetEnableEcoRadiator setEnableEcoRadiator = new SetEnableEcoRadiator(Parameter.SET_ENABLE_ECO_RADIATOR, setEnableEcoRadiatorDto.getTime(), setEnableEcoRadiatorDto.getValue());
+        setEnableEcoRadiatorRepo.save(setEnableEcoRadiator);
+        return setEnableEcoRadiatorDto;
     }
 
 }
