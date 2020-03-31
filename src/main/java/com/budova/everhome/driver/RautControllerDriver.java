@@ -83,6 +83,8 @@ public class RautControllerDriver {
     private SetEnableEcoRadiatorRepo setEnableEcoRadiatorRepo;
     @Autowired
     private SetEnableEcoConditionerRepo setEnableEcoConditionerRepo;
+    @Autowired
+    private SetEnableEcoRecuperatorRepo setEnableEcoRecuperatorRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -331,6 +333,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/SetEnableEcoConditioner", setEnableEcoConditionerDto);
             SetEnableEcoConditioner prevSetEnableEcoConditioner = setEnableEcoConditionerRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_CONDITIONER);
             setEnableEcoConditionerRepo.save(setEnableEcoConditioner);
+
+            float setEnableEcoRecuperatorVal = (float) regs[23];
+            SetEnableEcoRecuperator setEnableEcoRecuperator = new SetEnableEcoRecuperator(Parameter.SET_ENABLE_ECO_RECUPERATOR, now, setEnableEcoRecuperatorVal);
+            SetEnableEcoRecuperatorDto setEnableEcoRecuperatorDto = new SetEnableEcoRecuperatorDto(setEnableEcoRecuperator);
+            template.convertAndSend("/topic/SetEnableEcoRecuperator", setEnableEcoRecuperatorDto);
+            SetEnableEcoRecuperator prevSetEnableEcoRecuperator = setEnableEcoRecuperatorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_RECUPERATOR);
+            setEnableEcoRecuperatorRepo.save(setEnableEcoRecuperator);
 
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -842,5 +851,27 @@ public class RautControllerDriver {
         SetEnableEcoConditioner setEnableEcoConditioner = new SetEnableEcoConditioner(Parameter.SET_ENABLE_ECO_CONDITIONER, setEnableEcoConditionerDto.getTime(), setEnableEcoConditionerDto.getValue());
         setEnableEcoConditionerRepo.save(setEnableEcoConditioner);
         return setEnableEcoConditionerDto;
+    }
+
+    @MessageMapping("/SetEnableEcoRecuperator/incEnableEcoRecuperator")
+    @SendTo("/topic/set_enable_eco_recuperator")
+    public  SetEnableEcoRecuperatorDto incSetEnableEcoRecuperator (SetEnableEcoRecuperatorDto setEnableEcoRecuperatorDto) throws Exception{
+        setEnableEcoRecuperatorDto.setTime(LocalDateTime.now());
+        setEnableEcoRecuperatorDto.setValue(SetEnableEcoRecuperator.inBorder(setEnableEcoRecuperatorDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 23, (int) setEnableEcoRecuperatorDto.getValue().floatValue());
+        SetEnableEcoRecuperator setEnableEcoRecuperator = new SetEnableEcoRecuperator(Parameter.SET_ENABLE_ECO_RECUPERATOR, setEnableEcoRecuperatorDto.getTime(), setEnableEcoRecuperatorDto.getValue());
+        setEnableEcoRecuperatorRepo.save(setEnableEcoRecuperator);
+        return setEnableEcoRecuperatorDto;
+    }
+
+    @MessageMapping("/SetEnableEcoRecuperator/decEnableEcoRecuperator")
+    @SendTo("/topic/set_enable_eco_recuperator")
+    public  SetEnableEcoRecuperatorDto decSetEnableEcoRecuperator (SetEnableEcoRecuperatorDto setEnableEcoRecuperatorDto) throws Exception{
+        setEnableEcoRecuperatorDto.setTime(LocalDateTime.now());
+        setEnableEcoRecuperatorDto.setValue(SetEnableEcoRecuperator.inBorder(setEnableEcoRecuperatorDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 23, (int) setEnableEcoRecuperatorDto.getValue().floatValue());
+        SetEnableEcoRecuperator setEnableEcoRecuperator = new SetEnableEcoRecuperator(Parameter.SET_ENABLE_ECO_RECUPERATOR, setEnableEcoRecuperatorDto.getTime(), setEnableEcoRecuperatorDto.getValue());
+        setEnableEcoRecuperatorRepo.save(setEnableEcoRecuperator);
+        return setEnableEcoRecuperatorDto;
     }
 }

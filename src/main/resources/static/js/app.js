@@ -124,11 +124,15 @@ function connect() {
              updateSetEnableEcoRadiator(setEnableEcoRadiator.value);
         });
 
-                stompClient.subscribe('/topic/set_enable_eco_conditioner', setEnEcoCon => {
-                     var setEnableEcoConditioner= JSON.parse(setEnEcoCon.body);
-                     updateSetEnableEcoConditioner(setEnableEcoConditioner.value);
-                });
+        stompClient.subscribe('/topic/set_enable_eco_conditioner', setEnEcoCon => {
+             var setEnableEcoConditioner= JSON.parse(setEnEcoCon.body);
+             updateSetEnableEcoConditioner(setEnableEcoConditioner.value);
+        });
 
+        stompClient.subscribe('/topic/set_enable_eco_recuperator', setEnEcoRec => {
+             var setEnableEcoRecuperator= JSON.parse(setEnEcoRec.body);
+             updateSetEnableEcoRecuperator(setEnableEcoRecuperator.value);
+        });
 
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
@@ -205,6 +209,9 @@ function updateSetEnableEcoRadiator(value){
 }
 function updateSetEnableEcoConditioner(value){
     $("#set_enable_eco_conditioner").text(value);
+}
+function updateSetEnableEcoRecuperator(value){
+    $("#set_enable_eco_recuperator").text(value);
 }
 
 function updateSetCommand(cmd){
@@ -441,6 +448,16 @@ function setEnableEcoConditioner(value, dir){
     );
 }
 
+function setEnableEcoRecuperator(value, dir){
+    stompClient.send("/app/setEnableEcoRecuperator/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_enable_eco_recuperator").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -573,6 +590,12 @@ $(function () {
     });
     $("#decEnableEcoConditioner").click(() => {
         setEnableEcoConditioner($("#set_enable_eco_conditioner").val(), "decEnableEcoConditioner");
+    });
+    $("#incEnableEcoRecuperator").click(() => {
+        setEnableEcoRecuperator($("#set_enable_eco_recuperator").val(), "incEnableEcoRecuperator");
+    });
+    $("#decEnableEcoRecuperator").click(() => {
+        setEnableEcoRecuperator($("#set_enable_eco_recuperator").val(), "decEnableEcoRecuperator");
     });
 });
 
