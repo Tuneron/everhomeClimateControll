@@ -114,6 +114,11 @@ function connect() {
              updateSetSilence(setSilence.value);
         });
 
+        stompClient.subscribe('/topic/set_night', setNig => {
+             var setNight= JSON.parse(setNig.body);
+             updateSetNight(setNight.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -180,6 +185,9 @@ function updateSetOutsideConditions(value){
 }
 function updateSetSilence(value){
     $("#set_silence").text(value);
+}
+function updateSetNight(value){
+    $("#set_night").text(value);
 }
 
 function updateSetCommand(cmd){
@@ -386,6 +394,16 @@ function setSilence(value, dir){
     );
 }
 
+function setNight(value, dir){
+    stompClient.send("/app/setNight/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_night").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -500,6 +518,12 @@ $(function () {
     });
     $("#decSilence").click(() => {
         setSilence($("#set_silence").val(), "decSilence");
+    });
+    $("#incNight").click(() => {
+        setNight($("#set_night").val(), "incNight");
+    });
+    $("#decNight").click(() => {
+        setNight($("#set_night").val(), "decNight");
     });
 });
 

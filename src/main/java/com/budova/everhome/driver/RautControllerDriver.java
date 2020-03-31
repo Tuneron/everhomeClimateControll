@@ -77,6 +77,8 @@ public class RautControllerDriver {
     private SetOutsideConditionsRepo setOutsideConditionsRepo;
     @Autowired
     private SetSilenceRepo setSilenceRepo;
+    @Autowired
+    private SetNightRepo setNightRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -304,6 +306,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/setSilence", setSilenceDto);
             SetSilence prevSetSilence = setSilenceRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SILENCE);
             setSilenceRepo.save(setSilence);
+
+            float setNightVal = (float) regs[20];
+            SetNight setNight = new SetNight(Parameter.SET_NIGHT, now, setNightVal);
+            SetNightDto setNightDto = new SetNightDto(setNight);
+            template.convertAndSend("/topic/setNight", setNightDto);
+            SetNight prevSetNight = setNightRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_NIGHT);
+            setNightRepo.save(setNight);
 
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -749,6 +758,28 @@ public class RautControllerDriver {
         SetSilence setSilence = new SetSilence(Parameter.SET_SILENCE, setSilenceDto.getTime(), setSilenceDto.getValue());
         setSilenceRepo.save(setSilence);
         return setSilenceDto;
+    }
+
+    @MessageMapping("/setNight/incNight")
+    @SendTo("/topic/set_night")
+    public SetNightDto incSetNight (SetNightDto setNightDto) throws Exception{
+        setNightDto.setTime(LocalDateTime.now());
+        setNightDto.setValue(SetNight.inBorder(setNightDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 20, (int) setNightDto.getValue().floatValue());
+        SetNight setNight = new SetNight(Parameter.SET_NIGHT, setNightDto.getTime(), setNightDto.getValue());
+        setNightRepo.save(setNight);
+        return setNightDto;
+    }
+
+    @MessageMapping("/setNight/decNight")
+    @SendTo("/topic/set_night")
+    public SetNightDto decSetNight (SetNightDto setNightDto) throws Exception{
+        setNightDto.setTime(LocalDateTime.now());
+        setNightDto.setValue(SetNight.inBorder(setNightDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 20, (int) setNightDto.getValue().floatValue());
+        SetNight setNight = new SetNight(Parameter.SET_NIGHT, setNightDto.getTime(), setNightDto.getValue());
+        setNightRepo.save(setNight);
+        return setNightDto;
     }
 
 }
