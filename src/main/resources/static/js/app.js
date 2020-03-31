@@ -124,6 +124,12 @@ function connect() {
              updateSetEnableEcoRadiator(setEnableEcoRadiator.value);
         });
 
+                stompClient.subscribe('/topic/set_enable_eco_conditioner', setEnEcoCon => {
+                     var setEnableEcoConditioner= JSON.parse(setEnEcoCon.body);
+                     updateSetEnableEcoConditioner(setEnableEcoConditioner.value);
+                });
+
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -196,6 +202,9 @@ function updateSetNight(value){
 }
 function updateSetEnableEcoRadiator(value){
     $("#set_enable_eco_radiator").text(value);
+}
+function updateSetEnableEcoConditioner(value){
+    $("#set_enable_eco_conditioner").text(value);
 }
 
 function updateSetCommand(cmd){
@@ -422,6 +431,16 @@ function setEnableEcoRadiator(value, dir){
     );
 }
 
+function setEnableEcoConditioner(value, dir){
+    stompClient.send("/app/setEnableEcoConditioner/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_enable_eco_conditioner").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -548,6 +567,12 @@ $(function () {
     });
     $("#decEnableEcoRadiator").click(() => {
         setEnableEcoRadiator($("#set_enable_eco_radiator").val(), "decEnableEcoRadiator");
+    });
+    $("#incEnableEcoConditioner").click(() => {
+        setEnableEcoConditioner($("#set_enable_eco_conditioner").val(), "incEnableEcoConditioner");
+    });
+    $("#decEnableEcoConditioner").click(() => {
+        setEnableEcoConditioner($("#set_enable_eco_conditioner").val(), "decEnableEcoConditioner");
     });
 });
 

@@ -62,6 +62,8 @@ public class HomeController {
     private SetNightRepo setNightRepo;
     @Autowired
     private SetEnableEcoRadiatorRepo setEnableEcoRadiatorRepo;
+    @Autowired
+    private SetEnableEcoConditionerRepo setEnableEcoConditionerRepo;
 
     @GetMapping("/home")
     public String home(Model model) {
@@ -88,6 +90,7 @@ public class HomeController {
         SetSilence setSilence = setSilenceRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_SILENCE);
         SetNight setNight = setNightRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_NIGHT);
         SetEnableEcoRadiator setEnableEcoRadiator = setEnableEcoRadiatorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_RADIATOR);
+        SetEnableEcoConditioner setEnableEcoConditioner = setEnableEcoConditionerRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_CONDITIONER);
         Connection c = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
         model.addAttribute("humidity", h != null ? h.getValue() : "null");
         model.addAttribute("temperature", t1 != null ? t1.getValue() : "null");
@@ -112,6 +115,7 @@ public class HomeController {
         model.addAttribute("set_silence", setSilence != null ? setSilence.getValue() : "null");
         model.addAttribute("set_night", setNight != null ? setNight.getValue() : "null");
         model.addAttribute("set_enable_eco_radiator", setEnableEcoRadiator != null ? setEnableEcoRadiator.getValue() : "null");
+        model.addAttribute("set_enable_eco_conditioner", setEnableEcoConditioner != null ? setEnableEcoConditioner.getValue() : "null");
         model.addAttribute("connection", c != null ? c.getValue() : "null");
         List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE);
         StringBuilder sb = new StringBuilder();
