@@ -85,6 +85,8 @@ public class RautControllerDriver {
     private SetEnableEcoConditionerRepo setEnableEcoConditionerRepo;
     @Autowired
     private SetEnableEcoRecuperatorRepo setEnableEcoRecuperatorRepo;
+    @Autowired
+    private SetEnableEcoWaterFloorRepo setEnableEcoWaterFloorRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -341,6 +343,13 @@ public class RautControllerDriver {
             SetEnableEcoRecuperator prevSetEnableEcoRecuperator = setEnableEcoRecuperatorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_RECUPERATOR);
             setEnableEcoRecuperatorRepo.save(setEnableEcoRecuperator);
 
+            float setEnableEcoWaterFloorVal = (float) regs[24];
+            SetEnableEcoWaterFloor setEnableEcoWaterFloor = new SetEnableEcoWaterFloor(Parameter.SET_ENABLE_ECO_WATER_FLOOR, now, setEnableEcoWaterFloorVal);
+            SetEnableEcoWaterFloorDto setEnableEcoWaterFloorDto = new SetEnableEcoWaterFloorDto(setEnableEcoWaterFloor);
+            template.convertAndSend("/topic/SetEnableEcoWaterFloor", setEnableEcoWaterFloorDto);
+            SetEnableEcoWaterFloor prevSetEnableEcoWaterFloor = setEnableEcoWaterFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_WATER_FLOOR);
+            setEnableEcoWaterFloorRepo.save(setEnableEcoWaterFloor);
+            
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
 //            datePoint.setConditionerTemperature(20);
@@ -873,5 +882,27 @@ public class RautControllerDriver {
         SetEnableEcoRecuperator setEnableEcoRecuperator = new SetEnableEcoRecuperator(Parameter.SET_ENABLE_ECO_RECUPERATOR, setEnableEcoRecuperatorDto.getTime(), setEnableEcoRecuperatorDto.getValue());
         setEnableEcoRecuperatorRepo.save(setEnableEcoRecuperator);
         return setEnableEcoRecuperatorDto;
+    }
+
+    @MessageMapping("/SetEnableEcoWaterFloor/incEnableEcoWaterFloor")
+    @SendTo("/topic/set_enable_eco_water_floor")
+    public  SetEnableEcoWaterFloorDto incSetEnableEcoWaterFloor (SetEnableEcoWaterFloorDto setEnableEcoWaterFloorDto) throws Exception{
+        setEnableEcoWaterFloorDto.setTime(LocalDateTime.now());
+        setEnableEcoWaterFloorDto.setValue(SetEnableEcoWaterFloor.inBorder(setEnableEcoWaterFloorDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 24, (int) setEnableEcoWaterFloorDto.getValue().floatValue());
+        SetEnableEcoWaterFloor setEnableEcoWaterFloor = new SetEnableEcoWaterFloor(Parameter.SET_ENABLE_ECO_WATER_FLOOR, setEnableEcoWaterFloorDto.getTime(), setEnableEcoWaterFloorDto.getValue());
+        setEnableEcoWaterFloorRepo.save(setEnableEcoWaterFloor);
+        return setEnableEcoWaterFloorDto;
+    }
+
+    @MessageMapping("/SetEnableEcoWaterFloor/decEnableEcoWaterFloor")
+    @SendTo("/topic/set_enable_eco_water_floor")
+    public  SetEnableEcoWaterFloorDto decSetEnableEcoWaterFloor (SetEnableEcoWaterFloorDto setEnableEcoWaterFloorDto) throws Exception{
+        setEnableEcoWaterFloorDto.setTime(LocalDateTime.now());
+        setEnableEcoWaterFloorDto.setValue(SetEnableEcoWaterFloor.inBorder(setEnableEcoWaterFloorDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 24, (int) setEnableEcoWaterFloorDto.getValue().floatValue());
+        SetEnableEcoWaterFloor setEnableEcoWaterFloor = new SetEnableEcoWaterFloor(Parameter.SET_ENABLE_ECO_WATER_FLOOR, setEnableEcoWaterFloorDto.getTime(), setEnableEcoWaterFloorDto.getValue());
+        setEnableEcoWaterFloorRepo.save(setEnableEcoWaterFloor);
+        return setEnableEcoWaterFloorDto;
     }
 }

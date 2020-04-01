@@ -134,6 +134,11 @@ function connect() {
              updateSetEnableEcoRecuperator(setEnableEcoRecuperator.value);
         });
 
+        stompClient.subscribe('/topic/set_enable_eco_water_floor', setEnEcoWatFl => {
+             var setEnableEcoWaterFloor JSON.parse(setEnEcoWatFl.body);
+             updateSetEnableEcoWaterFloor(setEnableEcoWaterFloor.value);
+        });
+
         stompClient.subscribe('/topic/connection', v => {
             var valve = JSON.parse(v.body);
             updateConnection(valve.value);
@@ -212,6 +217,9 @@ function updateSetEnableEcoConditioner(value){
 }
 function updateSetEnableEcoRecuperator(value){
     $("#set_enable_eco_recuperator").text(value);
+}
+function updateSetEnableEcoWaterFloor(value){
+    $("#set_enable_eco_water_floor").text(value);
 }
 
 function updateSetCommand(cmd){
@@ -458,6 +466,16 @@ function setEnableEcoRecuperator(value, dir){
     );
 }
 
+function setEnableEcoWaterFloor(value, dir){
+    stompClient.send("/app/setEnableEcoWaterFloor/" + dir, {},
+        JSON.stringify(
+            {
+                value: parseFloat($("#set_enable_eco_water_floor").text())
+            }
+        )
+    );
+}
+
 $(function () {
     $(document).ready(() => {
         connect();
@@ -596,6 +614,12 @@ $(function () {
     });
     $("#decEnableEcoRecuperator").click(() => {
         setEnableEcoRecuperator($("#set_enable_eco_recuperator").val(), "decEnableEcoRecuperator");
+    });
+    $("#incEnableEcoWaterFloor").click(() => {
+        setEnableEcoWaterFloor($("#set_enable_eco_water_floor").val(), "incEnableEcoWaterFloor");
+    });
+    $("#decEnableEcoWaterFloor").click(() => {
+        setEnableEcoWaterFloor($("#set_enable_eco_water_floor").val(), "decEnableEcoWaterFloor");
     });
 });
 
