@@ -68,6 +68,8 @@ public class HomeController {
     private SetEnableEcoRecuperatorRepo setEnableEcoRecuperatorRepo;
     @Autowired
     private SetEnableEcoWaterFloorRepo setEnableEcoWaterFloorRepo;
+    @Autowired
+    private SetEnableEcoElectricFloorRepo setEnableEcoElectricFloorRepo;
 
     @GetMapping("/home")
     public String home(Model model) {
@@ -97,6 +99,7 @@ public class HomeController {
         SetEnableEcoConditioner setEnableEcoConditioner = setEnableEcoConditionerRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_CONDITIONER);
         SetEnableEcoRecuperator setEnableEcoRecuperator = setEnableEcoRecuperatorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_RECUPERATOR);
         SetEnableEcoWaterFloor setEnableEcoWaterFloor = setEnableEcoWaterFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_WATER_FLOOR);
+        SetEnableEcoElectricFloor setEnableEcoElectricFloor = setEnableEcoElectricFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_ELECTRIC_FLOOR);
         Connection c = connectionRepo.findFirstByParamIsOrderByTimeDesc(Parameter.RAUT_CONNECTION);
         model.addAttribute("humidity", h != null ? h.getValue() : "null");
         model.addAttribute("temperature", t1 != null ? t1.getValue() : "null");
@@ -124,6 +127,7 @@ public class HomeController {
         model.addAttribute("set_enable_eco_conditioner", setEnableEcoConditioner != null ? setEnableEcoConditioner.getValue() : "null");
         model.addAttribute("set_enable_eco_recuperator", setEnableEcoRecuperator != null ? setEnableEcoRecuperator.getValue() : "null");
         model.addAttribute("set_enable_eco_water_floor", setEnableEcoWaterFloor != null ? setEnableEcoWaterFloor.getValue() : "null");
+        model.addAttribute("set_enable_eco_electric_floor", setEnableEcoElectricFloor != null ? setEnableEcoElectricFloor.getValue() : "null");
         model.addAttribute("connection", c != null ? c.getValue() : "null");
         List<Temperature> temps = tempRepo.findTop10ByParamIsOrderByTimeDesc(Parameter.TEMPERATURE);
         StringBuilder sb = new StringBuilder();

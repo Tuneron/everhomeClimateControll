@@ -87,6 +87,8 @@ public class RautControllerDriver {
     private SetEnableEcoRecuperatorRepo setEnableEcoRecuperatorRepo;
     @Autowired
     private SetEnableEcoWaterFloorRepo setEnableEcoWaterFloorRepo;
+    @Autowired
+    private SetEnableEcoElectricFloorRepo setEnableEcoElectricFloorRepo;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -349,6 +351,13 @@ public class RautControllerDriver {
             template.convertAndSend("/topic/SetEnableEcoWaterFloor", setEnableEcoWaterFloorDto);
             SetEnableEcoWaterFloor prevSetEnableEcoWaterFloor = setEnableEcoWaterFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_WATER_FLOOR);
             setEnableEcoWaterFloorRepo.save(setEnableEcoWaterFloor);
+
+            float setEnableEcoElectricFloorVal = (float) regs[25];
+            SetEnableEcoElectricFloor setEnableEcoElectricFloor = new SetEnableEcoElectricFloor(Parameter.SET_ENABLE_ECO_ELECTRIC_FLOOR, now, setEnableEcoElectricFloorVal);
+            SetEnableEcoElectricFloorDto setEnableEcoElectricFloorDto = new SetEnableEcoElectricFloorDto(setEnableEcoElectricFloor);
+            template.convertAndSend("/topic/SetEnableEcoElectricFloor", setEnableEcoElectricFloorDto);
+            SetEnableEcoElectricFloor prevSetEnableEcoElectricFloor = setEnableEcoElectricFloorRepo.findFirstByParamIsOrderByTimeDesc(Parameter.SET_ENABLE_ECO_ELECTRIC_FLOOR);
+            setEnableEcoElectricFloorRepo.save(setEnableEcoElectricFloor);
             
 //            DatePoint datePoint = new DatePoint(Parameter.DATE_POINT, now, now);
 //            datePoint.setConditionerPower(1);
@@ -904,5 +913,27 @@ public class RautControllerDriver {
         SetEnableEcoWaterFloor setEnableEcoWaterFloor = new SetEnableEcoWaterFloor(Parameter.SET_ENABLE_ECO_WATER_FLOOR, setEnableEcoWaterFloorDto.getTime(), setEnableEcoWaterFloorDto.getValue());
         setEnableEcoWaterFloorRepo.save(setEnableEcoWaterFloor);
         return setEnableEcoWaterFloorDto;
+    }
+
+    @MessageMapping("/SetEnableEcoElectricFloor/incEnableEcoElectricFloor")
+    @SendTo("/topic/set_enable_eco_electric_floor")
+    public  SetEnableEcoElectricFloorDto incSetEnableEcoElectricFloor (SetEnableEcoElectricFloorDto setEnableEcoElectricFloorDto) throws Exception{
+        setEnableEcoElectricFloorDto.setTime(LocalDateTime.now());
+        setEnableEcoElectricFloorDto.setValue(SetEnableEcoElectricFloor.inBorder(setEnableEcoElectricFloorDto.getValue().floatValue() + 1F));
+        master.writeSingleRegister(1, 25, (int) setEnableEcoElectricFloorDto.getValue().floatValue());
+        SetEnableEcoElectricFloor setEnableEcoElectricFloor = new SetEnableEcoElectricFloor(Parameter.SET_ENABLE_ECO_ELECTRIC_FLOOR, setEnableEcoElectricFloorDto.getTime(), setEnableEcoElectricFloorDto.getValue());
+        setEnableEcoElectricFloorRepo.save(setEnableEcoElectricFloor);
+        return setEnableEcoElectricFloorDto;
+    }
+
+    @MessageMapping("/SetEnableEcoElectricFloor/decEnableEcoElectricFloor")
+    @SendTo("/topic/set_enable_eco_electric_floor")
+    public  SetEnableEcoElectricFloorDto decSetEnableEcoElectricFloor (SetEnableEcoElectricFloorDto setEnableEcoElectricFloorDto) throws Exception{
+        setEnableEcoElectricFloorDto.setTime(LocalDateTime.now());
+        setEnableEcoElectricFloorDto.setValue(SetEnableEcoElectricFloor.inBorder(setEnableEcoElectricFloorDto.getValue().floatValue() - 1F));
+        master.writeSingleRegister(1, 25, (int) setEnableEcoElectricFloorDto.getValue().floatValue());
+        SetEnableEcoElectricFloor setEnableEcoElectricFloor = new SetEnableEcoElectricFloor(Parameter.SET_ENABLE_ECO_ELECTRIC_FLOOR, setEnableEcoElectricFloorDto.getTime(), setEnableEcoElectricFloorDto.getValue());
+        setEnableEcoElectricFloorRepo.save(setEnableEcoElectricFloor);
+        return setEnableEcoElectricFloorDto;
     }
 }
