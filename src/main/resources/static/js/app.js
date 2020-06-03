@@ -135,12 +135,12 @@ function connect() {
         });
 
         stompClient.subscribe('/topic/set_enable_eco_water_floor', setEnEcoWatFl => {
-             var setEnableEcoWaterFloor JSON.parse(setEnEcoWatFl.body);
+             var setEnableEcoWaterFloor= JSON.parse(setEnEcoWatFl.body);
              updateSetEnableEcoWaterFloor(setEnableEcoWaterFloor.value);
         });
         
         stompClient.subscribe('/topic/set_enable_eco_electric_floor', setEnEcoEleFl => {
-             var setEnableEcoElectricFloor JSON.parse(setEnEcoEleFl.body);
+             var setEnableEcoElectricFloor= JSON.parse(setEnEcoEleFl.body);
              updateSetEnableEcoElectricFloor(setEnableEcoElectricFloor.value);
         });
 

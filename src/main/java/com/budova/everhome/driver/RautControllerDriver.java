@@ -93,7 +93,7 @@ public class RautControllerDriver {
     @Autowired
     private SimpMessagingTemplate template;
 
-    private final static String CONTROLLER_IP = "192.168.1.152";
+    private final static String CONTROLLER_IP = "10.132.83.152";
 
     private final TcpParameters tcpParameters;
     private final ModbusMaster master;
@@ -131,7 +131,9 @@ public class RautControllerDriver {
                 master.connect();
             }
 
-            int[] regs = master.readHoldingRegisters(1, 0, 21);
+            //need to add more registers
+
+            int[] regs = master.readHoldingRegisters(1, 0, 26);
 
             Connection c = new Connection(Parameter.RAUT_CONNECTION, now, true);
             ConnectionDto cDto = new ConnectionDto(c);
